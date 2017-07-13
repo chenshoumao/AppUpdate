@@ -123,18 +123,22 @@ public class LandDaoImpl implements LandDao {
 	 */
 	public Map<String, Object> generateIncrement(String key, String moduleVersionOfShip, String moduleVersionOfLand) {
 		// TODO Auto-generated method stub
-		
+		//旧版本（即船端的版本）
 		String oldVersionPath = resource.getString(key) + File.separator + moduleVersionOfShip;
+		//新版本（即岸端最新版本）
 		String newVersionPath = resource.getString(key) + File.separator + moduleVersionOfLand;
-		Map<String, FileMd5> path1Map;
+		Map<String, FileMd5> oldVersionMap;
 		try {
-			path1Map = listDir(oldVersionPath);
-
-			Map<String, FileMd5> path2Map = listDir(newVersionPath);
+			//用md5 标示旧版本的文件
+			oldVersionMap = listDir(oldVersionPath);
+			//用md5 标示新版本的文件
+			Map<String, FileMd5> newVersionMap = listDir(newVersionPath);
 			 
-			List<FileMd5> compareFile = compareFile(path2Map, path1Map);
+			//比较两版本的文件，将增量结果储存在 compareFile 的集合中
+			List<FileMd5> compareFile = compareFile(newVersionMap, oldVersionMap);
 			 
-			copyFile(compareFile);
+			//复制增量到一个临时目录
+			copyFile(compareFile,newVersionPath);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -146,38 +150,40 @@ public class LandDaoImpl implements LandDao {
 	/**
 	 * 打印结果 + 复制文件
 	 */
-	public static void copyFile(List<FileMd5> fileMd5s) {
+	public static void copyFile(List<FileMd5> fileMd5s,String startTag) {
 		CopyFileUtil copyUtil = new CopyFileUtil();
 
+		//获取指定的临时目录
+		String tempPath = resource.getString("tempPath");
 		boolean stateCopyResult = false;
 		for (FileMd5 fileMd5 : fileMd5s) {
 			System.out.println(fileMd5.getFile().getAbsolutePath() + " " + fileMd5.getMd5());
 
 			String filePath = fileMd5.getFile().getAbsolutePath();
-			String startTag = "D:\\海图项目\\zip2";
+			//String startTag = "D:\\海图项目\\zip2";
 			int index = filePath.indexOf(startTag);
 			if (index != -1) {
 				index = startTag.length() + 1;
 				filePath = filePath.substring(index, filePath.length());
 			}
 			stateCopyResult = copyUtil.copyFile(fileMd5.getFile().getAbsolutePath(),
-					"D:\\海图项目\\zip3" + File.separator + filePath, true);
+					tempPath + File.separator + filePath, true);
 		}
 
-		if (stateCopyResult) {
-			// 遍历目录获取文件小
-			File preZip = new File("D:\\海图项目\\zip3");
-			FileSize fileSize = new FileSize();
-			long size = fileSize.getFileSize(preZip);
-			 
-
-			// 压缩文件目录
-			boolean stateResult = zipFile(size);
-			
-			
-			 
-
-		}
+//		if (stateCopyResult) {
+//			// 遍历目录获取文件小
+//			File preZip = new File("D:\\海图项目\\zip3");
+//			FileSize fileSize = new FileSize();
+//			long size = fileSize.getFileSize(preZip);
+//			 
+//
+//			// 压缩文件目录
+//			boolean stateResult = zipFile(size);
+//			
+//			
+//			 
+//
+//		}
 
 	}
 	
