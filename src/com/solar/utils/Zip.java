@@ -41,6 +41,10 @@ public class Zip extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    public static void main(String[] args) {
+		Zip zip = new Zip();
+		zip.zip("D:/海图项目/压缩包路径", "D:/海图项目/解压路径/TEST.zip");
+	}
     
     public static boolean zip(String sourcePath, String outPutZipPath) {
     	boolean stateResult = false;
