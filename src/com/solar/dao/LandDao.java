@@ -3,7 +3,7 @@ package com.solar.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.solar.utils.Version;
+import com.solar.bean.Version;
 
 public interface LandDao {
 	

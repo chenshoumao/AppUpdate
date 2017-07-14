@@ -17,13 +17,13 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.solar.bean.Version;
 import com.solar.dao.LandDao;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileMd5;
 import com.solar.utils.FileSize;
 import com.solar.utils.MD5;
-import com.solar.utils.Version;
+import com.solar.utils.ReadFile;
 import com.solar.utils.VersionListUtil;
 import com.solar.utils.Zip;
 
@@ -31,6 +31,8 @@ public class LandDaoImpl implements LandDao {
 
 	// 版本命名规范，如10.0.0_db_release_20170713，可是可分为四个部分
 	private static int length = 4;
+	
+	private final String  VERSION = "version.txt";
 	
 	private static ResourceBundle resource = ResourceBundle.getBundle("path");
 
@@ -168,7 +170,17 @@ public class LandDaoImpl implements LandDao {
 			}
 			stateCopyResult = copyUtil.copyFile(fileMd5.getFile().getAbsolutePath(),
 					tempPath + File.separator + filePath, true);
+			//如果复制文件出现差错，则写倒日志中去
+			if(!stateCopyResult){
+				//写到文件中
+			}
 		}
+		
+		//打包文件，形成一个增量包
+		Zip zip = new Zip();
+		String sourcePath = resource.getString("tempPath");
+		String outPutZipPath = resource.getString("zipPath");
+		zip.zip(sourcePath, outPutZipPath); 
 
 //		if (stateCopyResult) {
 //			// 遍历目录获取文件小
@@ -303,8 +315,9 @@ public class LandDaoImpl implements LandDao {
 		String moduleVersionOfShip = shipVerionMap.get(key); 
 		if (!moduleVersionOfLand.equals(moduleVersionOfShip)) {
 			//检查是否存在依赖
-			String path = resource.getString(key) + File.separator + moduleVersionOfLand;
-			map = readFileByLines(path);
+			String path = resource.getString(key) + File.separator + moduleVersionOfLand + File.separator + VERSION;
+			ReadFile readFile = new ReadFile();
+			map = readFile.readFileByLines(path);
 			Set set = map.keySet();
 			Iterator it = set.iterator();
 			while(it.hasNext()){
@@ -336,43 +349,7 @@ public class LandDaoImpl implements LandDao {
 		return map;
 	}
 	
-	/**
-     * 以行为单位读取文件，常用于读面向行的格式化文件
-     */
-    public static Map<String, Object> readFileByLines(String fileName) {
-        File file = new File(fileName);
-        Map<String, Object> result = new HashMap<String,Object>();
-        BufferedReader reader = null;
-        try {
-            System.out.println("以行为单位读取文件内容，一次读一整行：");
-            reader = new BufferedReader(new FileReader(file));
-            String tempString = null;
-            int line = 1;
-            // 一次读入一行，直到读入null为文件结束
-            while ((tempString = reader.readLine()) != null) {
-                // 显示行号
-                System.out.println("line " + line + ": " + tempString);
-                String[] str = tempString.split(":");
-                if(str.length == 2)
-                	result.put(str[0], str[1]);
-                else {
-					//通知技术人员 命名不规范
-				}
-                line++;
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
-        return result;
-    }
+	
 	 
     public static void main(String[] args) {
 		String path = "D://海图//版本库//数据库//10.0.0_db_release_20170713//dep.txt";

@@ -33,7 +33,7 @@ public class CopyFileUtil {
     public static boolean copyFile(String srcFileName, String destFileName,  
             boolean overlay) {  
         File srcFile = new File(srcFileName);  
-        System.out.println("csm");
+        
         // 判断源文件是否存在  
         if (!srcFile.exists()) {  
             MESSAGE = "源文件：" + srcFileName + "不存在！";  
@@ -48,8 +48,7 @@ public class CopyFileUtil {
         }  
   
         // 判断目标文件是否存在  
-        File destFile = new File(destFileName);  
-        System.out.println(destFileName);
+        File destFile = new File(destFileName);   
         if (destFile.exists()) {  
             // 如果目标文件存在并允许覆盖  
             if (overlay) {  
@@ -70,22 +69,18 @@ public class CopyFileUtil {
         // 复制文件  
         int byteread = 0; // 读取的字节数  
         InputStream in = null;  
-        OutputStream out = null;  
-        
+        OutputStream out = null;   
         try {  
             in = new FileInputStream(srcFile);  
             out = new FileOutputStream(destFile);  
-            byte[] buffer = new byte[1024];  
-            System.out.println(destFile);
-  
+            byte[] buffer = new byte[1024];   
             while ((byteread = in.read(buffer)) != -1) {  
                 out.write(buffer, 0, byteread);  
             }  
             return true;  
-        } catch (FileNotFoundException e) {  
-        	System.out.println(e);System.out.println(00);
+        } catch (FileNotFoundException e) {   
             return false;  
-        } catch (IOException e) {  System.out.println(e);System.out.println(12);
+        } catch (IOException e) {   
             return false;  
         } finally {  
             try {  
@@ -93,7 +88,7 @@ public class CopyFileUtil {
                     out.close();  
                 if (in != null)  
                     in.close();  
-            } catch (IOException e) {  System.out.println(e);System.out.println(34);
+            } catch (IOException e) {   
                 e.printStackTrace();  
             }  
         }  

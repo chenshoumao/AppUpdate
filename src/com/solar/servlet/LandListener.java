@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solar.bean.Version;
 import com.solar.dao.LandDao;
-import com.solar.utils.Version;
 import com.solar.utils.VersionListUtil;
 
 /**
