@@ -34,7 +34,10 @@ public class LandDaoImpl implements LandDao {
 	
 	
 	
-	//
+	
+	
+	
+	//12312
  
 	// 版本命名规范，如10.0.0_db_release_20170713，可是可分为四个部分
 	private static int length = 4;
@@ -48,7 +51,7 @@ public class LandDaoImpl implements LandDao {
 	@Override
 	public Map<String, Object> analysisVersion(String versionInfo) {
 		// TODO Auto-generated method stub
-		// 解析各个版本，如你图，数据库，web 以及 想要更新的对应的版本4561
+		// 解析各个版本，如你图，数据库，web 以及 想要更新的对应的版本45612``21
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
