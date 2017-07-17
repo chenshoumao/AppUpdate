@@ -30,7 +30,7 @@ import com.solar.utils.Zip;
 
 public class LandDaoImpl implements LandDao {
 
-	// °æ±¾ÃüÃû¹æ·¶£¬Èç10.0.0_db_release_20170713£¬¿ÉÊÇ¿É·ÖÎªËÄ¸ö²¿·Ö
+	// ç‰ˆæœ¬å‘½åè§„èŒƒï¼Œå¦‚10.0.0_db_release_20170713ï¼Œå¯æ˜¯å¯åˆ†ä¸ºå››ä¸ªéƒ¨åˆ†
 	private static int length = 4;
 
 	private final String VERSION = "version.txt";
@@ -42,7 +42,7 @@ public class LandDaoImpl implements LandDao {
 	@Override
 	public Map<String, Object> analysisVersion(String versionInfo) {
 		// TODO Auto-generated method stub
-		// ½âÎö¸÷¸ö°æ±¾£¬ÈçÄãÍ¼£¬Êı¾İ¿â£¬web ÒÔ¼° ÏëÒª¸üĞÂµÄ¶ÔÓ¦µÄ°æ±¾
+		// è§£æå„ä¸ªç‰ˆæœ¬ï¼Œå¦‚ä½ å›¾ï¼Œæ•°æ®åº“ï¼Œweb ä»¥åŠ æƒ³è¦æ›´æ–°çš„å¯¹åº”çš„ç‰ˆæœ¬456
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -50,7 +50,7 @@ public class LandDaoImpl implements LandDao {
 			Map<String, Map<String, String>> map;
 			map = mapper.readValue(versionInfo, HashMap.class);
 
-			// ÓÃList ¼¯ºÏ·â×° ´¬¶ËµÄ°æ±¾ĞÅÏ¢
+			// ç”¨List é›†åˆå°è£… èˆ¹ç«¯çš„ç‰ˆæœ¬ä¿¡æ¯
 			Map<String, String> shipVersionMap = new HashMap<String, String>();
 			shipVersionMap = map.get("ship");
 
@@ -58,18 +58,18 @@ public class LandDaoImpl implements LandDao {
 			Iterator it = set.iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
-				// »ñÈ¡´Ë²¿·ÖÔÚ´¬¶ËµÄ°æ±¾
+				// è·å–æ­¤éƒ¨åˆ†åœ¨èˆ¹ç«¯çš„ç‰ˆæœ¬
 				String moduleVersionOfShip = shipVersionMap.get(key);
-				// ·Ç¿Õ£¬Ôò»ñÈ¡¶ÔÓ¦ÔÚ°¶¶ËµÄ°æ±¾
+				// éç©ºï¼Œåˆ™è·å–å¯¹åº”åœ¨å²¸ç«¯çš„ç‰ˆæœ¬
 				if (!moduleVersionOfShip.equals(null)) {
-					// »ñÈ¡ÔÚ´¬¶ËµÄ×îĞÂ°æ±¾
+					// è·å–åœ¨èˆ¹ç«¯çš„æœ€æ–°ç‰ˆæœ¬
 					List<Version> keyList = getVersionFromPath(resource.getString(key));
 					String upToDateVersion = keyList.get(0).toString();
 					resultMap = versionFilter(key, shipVersionMap, upToDateVersion);
-					// Éú³ÉÔöÁ¿Éı¼¶°ü
+					// ç”Ÿæˆå¢é‡å‡çº§åŒ…
 					if ((boolean) resultMap.get("result")) {
 						resultMap.clear();
-						// Éú³É¶ÔÓ¦µÄÔöÁ¿°ü
+						// ç”Ÿæˆå¯¹åº”çš„å¢é‡åŒ…
 						resultMap.put("result",generateIncrement(key, moduleVersionOfShip, upToDateVersion)); 
 					} else {
 						return resultMap;
@@ -92,11 +92,11 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @time 2017-07-13
-	 * @function »ñÈ¡°æ±¾µÄ¼¯ºÏĞÅÏ¢
+	 * @function è·å–ç‰ˆæœ¬çš„é›†åˆä¿¡æ¯
 	 * @param path
-	 *            °æ±¾µÄÂ·¾¶
+	 *            ç‰ˆæœ¬çš„è·¯å¾„
 	 */
 	@Override
 	public List<Version> getVersionFromPath(String path) {
@@ -112,12 +112,12 @@ public class LandDaoImpl implements LandDao {
 			for (File fileIt : fileList) {
 				String name = fileIt.getName();
 				String[] validateName = name.split("_");
-				// ÅĞ¶Ï°æ±¾µÄÃüÃûÊÇ·ñ¹æ·¶£¬ÈôÊÇ²»¹æ·¶£¬Òª¼°Ê±Í¨Öª¼¼ÊõÈËÔ±
+				// åˆ¤æ–­ç‰ˆæœ¬çš„å‘½åæ˜¯å¦è§„èŒƒï¼Œè‹¥æ˜¯ä¸è§„èŒƒï¼Œè¦åŠæ—¶é€šçŸ¥æŠ€æœ¯äººå‘˜
 				if (validateName.length == length)
 					list.add(new Version(name));
 				else {
-					System.out.println("ÃüÃû·Ç·¨£¡:  " + name);
-					// Í¨ÖªÏà¹ØÈËÔ±£¬°æ±¾¿âÃüÃû²»¹æ·¶
+					System.out.println("å‘½åéæ³•ï¼:  " + name);
+					// é€šçŸ¥ç›¸å…³äººå‘˜ï¼Œç‰ˆæœ¬åº“å‘½åä¸è§„èŒƒ
 				}
 			}
 		}
@@ -130,23 +130,23 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @time 2017-07-13
-	 * @function Éú³É¶ÔÓ¦µÄ°æ±¾ÔöÁ¿Éı¼¶°ü£¬²¢ÇÒ·ÅÔÚÖ¸¶¨Ä¿Â¼Ö®ÏÂ
+	 * @function ç”Ÿæˆå¯¹åº”çš„ç‰ˆæœ¬å¢é‡å‡çº§åŒ…ï¼Œå¹¶ä¸”æ”¾åœ¨æŒ‡å®šç›®å½•ä¹‹ä¸‹
 	 * @param key
-	 *            ¶ÔÓ¦µÄ¸üĞÂ²¿·ÖÃû³Æ
+	 *            å¯¹åº”çš„æ›´æ–°éƒ¨åˆ†åç§°
 	 * @param moduleVersionOfShip
-	 *            ´¬¶ËµÄ°æ±¾
+	 *            èˆ¹ç«¯çš„ç‰ˆæœ¬
 	 * @param moduleVersionOfLand
-	 *            °¶¶ËµÄ°æ±¾
+	 *            å²¸ç«¯çš„ç‰ˆæœ¬
 	 */
 	public boolean generateIncrement(String key, String moduleVersionOfShip, String moduleVersionOfLand) {
 		// TODO Auto-generated method stub
 		boolean result = false;
-		// ¾É°æ±¾£¨¼´´¬¶ËµÄ°æ±¾£©
+		// æ—§ç‰ˆæœ¬ï¼ˆå³èˆ¹ç«¯çš„ç‰ˆæœ¬ï¼‰
 		String oldVersionPath = resource.getString(key) + "/" + moduleVersionOfShip + "/";
 		
-		// ĞÂ°æ±¾£¨¼´°¶¶Ë×îĞÂ°æ±¾£©
+		// æ–°ç‰ˆæœ¬ï¼ˆå³å²¸ç«¯æœ€æ–°ç‰ˆæœ¬ï¼‰
 		String newVersionPath = resource.getString(key) +"/"+ moduleVersionOfLand + "/";
 		try {
 			oldVersionPath = new String(oldVersionPath.getBytes("ISO-8859-1"), "utf-8");
@@ -155,15 +155,15 @@ public class LandDaoImpl implements LandDao {
 		
 		    Map<String, FileMd5> oldVersionMap;
 		
-			// ÓÃmd5 ±êÊ¾¾É°æ±¾µÄÎÄ¼ş
+			// ç”¨md5 æ ‡ç¤ºæ—§ç‰ˆæœ¬çš„æ–‡ä»¶
 			oldVersionMap = listDir(oldVersionPath);
-			// ÓÃmd5 ±êÊ¾ĞÂ°æ±¾µÄÎÄ¼ş
+			// ç”¨md5 æ ‡ç¤ºæ–°ç‰ˆæœ¬çš„æ–‡ä»¶
 			Map<String, FileMd5> newVersionMap = listDir(newVersionPath);
 
-			// ±È½ÏÁ½°æ±¾µÄÎÄ¼ş£¬½«ÔöÁ¿½á¹û´¢´æÔÚ compareFile µÄ¼¯ºÏÖĞ
+			// æ¯”è¾ƒä¸¤ç‰ˆæœ¬çš„æ–‡ä»¶ï¼Œå°†å¢é‡ç»“æœå‚¨å­˜åœ¨ compareFile çš„é›†åˆä¸­
 			List<FileMd5> compareFile = compareFile(newVersionMap, oldVersionMap);
 
-			// ¸´ÖÆÔöÁ¿µ½Ò»¸öÁÙÊ±Ä¿Â¼
+			// å¤åˆ¶å¢é‡åˆ°ä¸€ä¸ªä¸´æ—¶ç›®å½•
 			copyFile(key,compareFile, newVersionPath);
 			result = true;
 		} catch (IOException e) {
@@ -176,12 +176,12 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * ´òÓ¡½á¹û + ¸´ÖÆÎÄ¼ş
+	 * æ‰“å°ç»“æœ + å¤åˆ¶æ–‡ä»¶
 	 */
 	public static void copyFile(String key,List<FileMd5> fileMd5s, String startTag) {
 		CopyFileUtil copyUtil = new CopyFileUtil();
 
-		// »ñÈ¡Ö¸¶¨µÄÁÙÊ±Ä¿Â¼
+		// è·å–æŒ‡å®šçš„ä¸´æ—¶ç›®å½•
 		String tempPath = resource.getString("tempPath");
 		try {
 			tempPath = new String(tempPath.getBytes("ISO-8859-1"), "utf-8");
@@ -192,7 +192,7 @@ public class LandDaoImpl implements LandDao {
 
 				String filePath = fileMd5.getFile().getAbsolutePath();
 				filePath = filePath.replaceAll("\\\\", "/");
-				// String startTag = "D:\\º£Í¼ÏîÄ¿\\zip2";
+				// String startTag = "D:\\æµ·å›¾é¡¹ç›®\\zip2";
 				int index = filePath.indexOf(startTag);
 				if (index != -1) {
 					index = startTag.length();
@@ -200,9 +200,9 @@ public class LandDaoImpl implements LandDao {
 				}
 				stateCopyResult = copyUtil.copyFile(fileMd5.getFile().getAbsolutePath(),
 						tempPath + File.separator + key + File.separator + filePath, true);
-				// Èç¹û¸´ÖÆÎÄ¼ş³öÏÖ²î´í£¬ÔòĞ´µ¹ÈÕÖ¾ÖĞÈ¥
+				// å¦‚æœå¤åˆ¶æ–‡ä»¶å‡ºç°å·®é”™ï¼Œåˆ™å†™å€’æ—¥å¿—ä¸­å»
 				if (!stateCopyResult) {
-					// Ğ´µ½ÎÄ¼şÖĞ
+					// å†™åˆ°æ–‡ä»¶ä¸­
 				}
 			}
 
@@ -211,11 +211,11 @@ public class LandDaoImpl implements LandDao {
 			e.printStackTrace();
 		}
 
-		// ´ò°üÎÄ¼ş£¬ĞÎ³ÉÒ»¸öÔöÁ¿°ü
+		// æ‰“åŒ…æ–‡ä»¶ï¼Œå½¢æˆä¸€ä¸ªå¢é‡åŒ…
 		Zip zip = new Zip();
 		String sourcePath = resource.getString("tempPath"); 
 		String outPutZipPath = resource.getString("zipPath");
-		//×ªÂë
+		//è½¬ç 
 		try {
 			sourcePath =  new String(sourcePath.getBytes("ISO-8859-1"), "utf-8");
 			outPutZipPath =  new String(outPutZipPath.getBytes("ISO-8859-1"), "utf-8");
@@ -225,13 +225,13 @@ public class LandDaoImpl implements LandDao {
 		zip.zip(sourcePath, outPutZipPath);
 
 		// if (stateCopyResult) {
-		// // ±éÀúÄ¿Â¼»ñÈ¡ÎÄ¼şĞ¡
-		// File preZip = new File("D:\\º£Í¼ÏîÄ¿\\zip3");
+		// // éå†ç›®å½•è·å–æ–‡ä»¶å°
+		// File preZip = new File("D:\\æµ·å›¾é¡¹ç›®\\zip3");
 		// FileSize fileSize = new FileSize();
 		// long size = fileSize.getFileSize(preZip);
 		//
 		//
-		// // Ñ¹ËõÎÄ¼şÄ¿Â¼
+		// // å‹ç¼©æ–‡ä»¶ç›®å½•
 		// boolean stateResult = zipFile(size);
 		//
 		//
@@ -243,15 +243,15 @@ public class LandDaoImpl implements LandDao {
 
 	public static boolean zipFile(long size) {
 		boolean stateResult = false;
-		// Ñ¹ËõÎÄ¼şÄ¿Â¼
+		// å‹ç¼©æ–‡ä»¶ç›®å½•
 		Zip zip = new Zip();
 
 		try {
 
-			stateResult = zip.zip("D:\\º£Í¼ÏîÄ¿\\zip3", "D:\\º£Í¼ÏîÄ¿\\zip4\\" + size + ".zip");
-			File zipFile = new File("D:\\º£Í¼ÏîÄ¿\\zip4\\" + size + ".zip");
+			stateResult = zip.zip("D:\\æµ·å›¾é¡¹ç›®\\zip3", "D:\\æµ·å›¾é¡¹ç›®\\zip4\\" + size + ".zip");
+			File zipFile = new File("D:\\æµ·å›¾é¡¹ç›®\\zip4\\" + size + ".zip");
 			long zipSize = zipFile.length();
-			zipFile.renameTo(new File("D:\\º£Í¼ÏîÄ¿\\zip4\\" + zipSize + "_" + size + ".zip"));
+			zipFile.renameTo(new File("D:\\æµ·å›¾é¡¹ç›®\\zip4\\" + zipSize + "_" + size + ".zip"));
 			// System.out.println(zipFile.getName() + "," + zipFile.length());
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -262,7 +262,7 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * ±È½ÏÁ½¸öÎÄ¼ş¼ĞµÄ²»Í¬
+	 * æ¯”è¾ƒä¸¤ä¸ªæ–‡ä»¶å¤¹çš„ä¸åŒ
 	 */
 	public static List<FileMd5> compareFile(Map<String, FileMd5> path1Map, Map<String, FileMd5> path2Map) {
 		List<FileMd5> list = new ArrayList<FileMd5>();
@@ -270,13 +270,13 @@ public class LandDaoImpl implements LandDao {
 			FileMd5 fileMd5 = path1Map.get(key);
 			FileMd5 _fileMd5 = path2Map.get(key);
 
-			// ²»¹ÜÎÄ¼ş¼Ğ»¹ÊÇÎÄ¼ş£¬Ö»Òªpath2Ã»ÓĞÔòaddµ½±È½Ï½á¹û¼¯ÖĞ
+			// ä¸ç®¡æ–‡ä»¶å¤¹è¿˜æ˜¯æ–‡ä»¶ï¼Œåªè¦path2æ²¡æœ‰åˆ™addåˆ°æ¯”è¾ƒç»“æœé›†ä¸­
 			if (_fileMd5 == null) {
 				list.add(fileMd5);
 				continue;
 			}
 
-			// ÎÄ¼şµÄmd5Öµ²»Í¬Ôòaddµ½±È½Ï½á¹û¼¯ÖĞ
+			// æ–‡ä»¶çš„md5å€¼ä¸åŒåˆ™addåˆ°æ¯”è¾ƒç»“æœé›†ä¸­
 			if (fileMd5.getFile().isFile() && !fileMd5.getMd5().equals(_fileMd5.getMd5())) {
 				list.add(fileMd5);
 			}
@@ -285,7 +285,7 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * »ñÈ¡Ö¸¶¨ÎÄ¼ş¼ĞÏÂµÄÎÄ¼ş¼ĞÂ·¾¶ºÍÎÄ¼şmd5Öµ
+	 * è·å–æŒ‡å®šæ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶å¤¹è·¯å¾„å’Œæ–‡ä»¶md5å€¼
 	 */
 	private static Map<String, FileMd5> listDir(String dir) throws IOException {
 		Map<String, FileMd5> map = new HashMap<String, FileMd5>();
@@ -297,7 +297,7 @@ public class LandDaoImpl implements LandDao {
 			// String key = file.getAbsolutePath().replaceAll("\\\\", "/");
 			String key = file.getAbsolutePath();
 			key = key.replaceAll("\\\\", "/");
-			key = key.replaceAll(dir, "");// È¥µô¸ùÄ¿Â¼  
+			key = key.replaceAll(dir, "");// å»æ‰æ ¹ç›®å½•  
 
 			int index = key.indexOf(dir);
 			if (index != -1) {
@@ -306,7 +306,7 @@ public class LandDaoImpl implements LandDao {
 			}
 			// path = path.replaceAll("\\\\", "\");
 
-			String md5 = "";// ÎÄ¼ş¼ĞµÄmd5Ä¬ÈÏÎª¿Õ,¼´²»±È½Ïmd5Öµ
+			String md5 = "";// æ–‡ä»¶å¤¹çš„md5é»˜è®¤ä¸ºç©º,å³ä¸æ¯”è¾ƒmd5å€¼
 			if (file.isFile()) {
 				// String text = FileUtils.readFileToString(file);
 				md5 = MD5.getFileMD5(file);
@@ -319,7 +319,7 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * »ñÈ¡Ö¸¶¨Â·¾¶ÏÂµÄËùÓĞÎÄ¼şÂ·¾¶
+	 * è·å–æŒ‡å®šè·¯å¾„ä¸‹çš„æ‰€æœ‰æ–‡ä»¶è·¯å¾„
 	 */
 	private static List<File> listPath(File path) {
 		List<File> list = new ArrayList<File>();
@@ -339,15 +339,15 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @time 2017-07-13
-	 * @function ÅĞ¶Ï°æ±¾¼äµÄ²îÒì£¬ÊÇ·ñÓĞÔöÁ¿£¬»òÕßÊÇ·ñ´æÔÚ°æ±¾µÄÒÀÀµ
+	 * @function åˆ¤æ–­ç‰ˆæœ¬é—´çš„å·®å¼‚ï¼Œæ˜¯å¦æœ‰å¢é‡ï¼Œæˆ–è€…æ˜¯å¦å­˜åœ¨ç‰ˆæœ¬çš„ä¾èµ–
 	 * @param key
-	 *            ¶ÔÓ¦µÄ¸üĞÂ²¿·ÖÃû³Æ
+	 *            å¯¹åº”çš„æ›´æ–°éƒ¨åˆ†åç§°
 	 * @param moduleVersionOfShip
-	 *            ´¬¶ËµÄ°æ±¾
+	 *            èˆ¹ç«¯çš„ç‰ˆæœ¬
 	 * @param moduleVersionOfLand
-	 *            °¶¶ËµÄ°æ±¾
+	 *            å²¸ç«¯çš„ç‰ˆæœ¬
 	 */
 	public Map<String, Object> versionFilter(String key, Map<String, String> shipVerionMap,
 			String moduleVersionOfLand) {
@@ -355,7 +355,7 @@ public class LandDaoImpl implements LandDao {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String moduleVersionOfShip = shipVerionMap.get(key);
 		if (!moduleVersionOfLand.equals(moduleVersionOfShip)) {
-			// ¼ì²éÊÇ·ñ´æÔÚÒÀÀµ
+			// æ£€æŸ¥æ˜¯å¦å­˜åœ¨ä¾èµ–
 			String path = resource.getString(key) + File.separator + moduleVersionOfLand + File.separator + VERSION;
 			try {
 				path = new String(path.getBytes("ISO-8859-1"), "utf-8");
@@ -369,14 +369,14 @@ public class LandDaoImpl implements LandDao {
 			Iterator it = set.iterator();
 			while (it.hasNext()) {
 				String mapKey = (String) it.next();
-				// ±¾µØÒÀÀµ
+				// æœ¬åœ°ä¾èµ–
 				String localDep = (String) map.get(mapKey);
 				String shipVersion = shipVerionMap.get(mapKey);
 				if (localDep.contains(shipVersion)) {
 					continue;
 				}
 				map.clear();
-				String responseInfo = "°æ±¾´æÔÚÒÀÀµ£¬ĞèÒª°Ñ" + mapKey + "¸üĞÂ";
+				String responseInfo = "ç‰ˆæœ¬å­˜åœ¨ä¾èµ–ï¼Œéœ€è¦æŠŠ" + mapKey + "æ›´æ–°";
 				map.put("info", responseInfo);
 				map.put("result", false);
 				return map;
@@ -384,8 +384,8 @@ public class LandDaoImpl implements LandDao {
 
 			map.put("result", true);
 		} else {
-			// °æ±¾Ò»ÖÂ£¬ÎŞĞè¸üĞÂ
-			String responseInfo = "°æ±¾Ò»ÖÂ£¬ÎŞĞè¸üĞÂ";
+			// ç‰ˆæœ¬ä¸€è‡´ï¼Œæ— éœ€æ›´æ–°
+			String responseInfo = "ç‰ˆæœ¬ä¸€è‡´ï¼Œæ— éœ€æ›´æ–°";
 			map.put("info", responseInfo);
 			map.put("result", false);
 		}
@@ -394,24 +394,24 @@ public class LandDaoImpl implements LandDao {
 	}
 
 	public static void sfdsd() {
-		String path = "D://º£Í¼//°æ±¾¿â//Êı¾İ¿â//10.0.0_db_release_20170713//dep.txt";
+		String path = "D://æµ·å›¾//ç‰ˆæœ¬åº“//æ•°æ®åº“//10.0.0_db_release_20170713//dep.txt";
 		File file = new File(path);
 		String result = "";
 		BufferedReader reader = null;
 		try {
-			System.out.println("ÒÔĞĞÎªµ¥Î»¶ÁÈ¡ÎÄ¼şÄÚÈİ£¬Ò»´Î¶ÁÒ»ÕûĞĞ£º");
+			System.out.println("ä»¥è¡Œä¸ºå•ä½è¯»å–æ–‡ä»¶å†…å®¹ï¼Œä¸€æ¬¡è¯»ä¸€æ•´è¡Œï¼š");
 			reader = new BufferedReader(new FileReader(file));
 			String tempString = null;
 			int line = 1;
-			// Ò»´Î¶ÁÈëÒ»ĞĞ£¬Ö±µ½¶ÁÈënullÎªÎÄ¼ş½áÊø
+			// ä¸€æ¬¡è¯»å…¥ä¸€è¡Œï¼Œç›´åˆ°è¯»å…¥nullä¸ºæ–‡ä»¶ç»“æŸ
 			while ((tempString = reader.readLine()) != null) {
-				// ÏÔÊ¾ĞĞºÅ
+				// æ˜¾ç¤ºè¡Œå·
 				System.out.println("line " + line + ": " + tempString);
 				String[] str = tempString.split(":");
 				if (str.length == 2)
 					result += tempString;
 				else {
-					// Í¨Öª¼¼ÊõÈËÔ± ÃüÃû²»¹æ·¶
+					// é€šçŸ¥æŠ€æœ¯äººå‘˜ å‘½åä¸è§„èŒƒ
 				}
 				line++;
 			}
