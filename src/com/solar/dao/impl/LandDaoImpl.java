@@ -30,8 +30,13 @@ import com.solar.utils.Zip;
 
 public class LandDaoImpl implements LandDao {
 
+	
+	
+	
+	
+	//
  
-	// 版本命名规范，如10.0.0_db_release_20170713，可是可分为四个部分 111
+	// 版本命名规范，如10.0.0_db_release_20170713，可是可分为四个部分
 	private static int length = 4;
 
 	private final String VERSION = "version.txt";
