@@ -43,13 +43,13 @@ public class LandListener extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
-		//»ñÈ¡´¬µÄ°æ±¾
+		//è·å–èˆ¹çš„ç‰ˆæœ¬
 		String versionInfo = request.getParameter("ship_version");
 		
-		//½âÎö¸÷¸ö°æ±¾£¬ÈçÄãÍ¼£¬Êı¾İ¿â£¬web ÒÔ¼° ÏëÒª¸üĞÂµÄ¶ÔÓ¦µÄ°æ±¾
+		//è§£æå„ä¸ªç‰ˆæœ¬ï¼Œå¦‚ä½ å›¾ï¼Œæ•°æ®åº“ï¼Œweb ä»¥åŠ æƒ³è¦æ›´æ–°çš„å¯¹åº”çš„ç‰ˆæœ¬1231
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Map<String,String>> map = mapper.readValue(versionInfo, HashMap.class);
-		//ÓÃList ¼¯ºÏ·â×° ´¬¶ËµÄ°æ±¾ĞÅÏ¢
+		//ç”¨List é›†åˆå°è£… èˆ¹ç«¯çš„ç‰ˆæœ¬ä¿¡æ¯
 		Map<String,String> shipVersionMap = new HashMap<String, String>(); 
 		shipVersionMap = map.get("ship");
 		 
@@ -58,13 +58,13 @@ public class LandListener extends HttpServlet {
 		Iterator it = set.iterator();
 		while(it.hasNext()){
 			String key = (String) it.next();
-			//»ñÈ¡´Ë²¿·ÖÔÚ°¶¶ËµÄ°æ±¾
+			//è·å–æ­¤éƒ¨åˆ†åœ¨å²¸ç«¯çš„ç‰ˆæœ¬
 			String moduleVersionOfLand = shipVersionMap.get(key);
-			//·Ç¿Õ£¬Ôò»ñÈ¡¶ÔÓ¦ÔÚ´¬¶ËµÄ°æ±¾
+			//éç©ºï¼Œåˆ™è·å–å¯¹åº”åœ¨èˆ¹ç«¯çš„ç‰ˆæœ¬
 			if(moduleVersionOfLand.equals(null)){
 				String moduleVersionOfShip = shipVersionMap.get(key);
-				//ÕâÀï¶Ô´Ë²¿·Ö¶ÔÓ¦ÓÚ´¬¶ËµÄ°æ±¾²»ÑéÖ¤ÊÇ·ñÎª¿Õ£¬Ò»¿ªÊ¼ÔÚ´¬¶Ë·¢ËÍÇëÇóÊ±ÑéÖ¤¼´¿É
-				//Éú³ÉÔöÁ¿Éı¼¶°ü
+				//è¿™é‡Œå¯¹æ­¤éƒ¨åˆ†å¯¹åº”äºèˆ¹ç«¯çš„ç‰ˆæœ¬ä¸éªŒè¯æ˜¯å¦ä¸ºç©ºï¼Œä¸€å¼€å§‹åœ¨èˆ¹ç«¯å‘é€è¯·æ±‚æ—¶éªŒè¯å³å¯
+				//ç”Ÿæˆå¢é‡å‡çº§åŒ…
 			}
 		}
 		
