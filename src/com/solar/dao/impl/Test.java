@@ -10,7 +10,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;  
   
   
-public class Test {  
+public class test {  
       
     public static final int BUFSIZE = 1024 * 8;  
       
