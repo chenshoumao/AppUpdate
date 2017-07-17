@@ -10,20 +10,21 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solar.dao.ShipDao;
 import com.solar.utils.ReadFile;
 import com.sun.jna.Function;
 
 public class ShipDaoImpl implements ShipDao {
 	
-	private ResourceBundle resource = ResourceBundle.getBundle("ship");
+	private ResourceBundle resource = ResourceBundle.getBundle("config/ship");
 	private final String  VERSION = "version.txt";
 
 	/**
 	 * @author 陈守貌
 	 * @Time 2017-07-14
 	 * @Function 船端请求更新
-	 * @param json,是版本信息的格式化字符串，包括船端的版本，岸端的版本11
+	 * @param json,是版本信息的格式化字符串，包括船端的版本，岸端的版本
 	 */
 	@Override
 	public Map<String, Object> updateVersion(String json) {
@@ -43,9 +44,9 @@ public class ShipDaoImpl implements ShipDao {
 		// TODO Auto-generated method stub
 		Map<String, Object> result = new HashMap<String,Object>();
 		for(String str:key){
-			String versionPath = resource.getString(str) + File.separator + key; 
+			String versionPath = resource.getString("web") + File.separator +resource.getString(str) + File.separator + VERSION; 
 			ReadFile readFile = new ReadFile();
-			Map<String, Object> map = readFile.readFileByLines(versionPath + File.separator + VERSION);
+			Map<String, Object> map = readFile.readFileByLines(versionPath);
 			result.putAll(map);
 		}
 		return result;
@@ -55,6 +56,12 @@ public class ShipDaoImpl implements ShipDao {
 	public Map<String, Object> upzip() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		Map<String, Object> map = new HashMap<String,Object>();
+		map.put("db", 12312);
+		System.out.println(123);
 	}
 
 }

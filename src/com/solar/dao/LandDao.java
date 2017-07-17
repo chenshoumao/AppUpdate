@@ -13,5 +13,5 @@ public interface LandDao {
 	
 	public List<Version> getVersionFromPath(String path);
 	
-	public Map<String, Object> generateIncrement(String key,String moduleVersionOfShip,String moduleVersionOfLand);
+	public boolean generateIncrement(String key,String moduleVersionOfShip,String moduleVersionOfLand);
 }

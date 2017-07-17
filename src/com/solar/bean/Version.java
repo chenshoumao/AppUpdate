@@ -22,6 +22,7 @@ import com.solar.utils.Zip;
 
 public class Version implements Comparable{
 	private String main_Version;
+	private String type_Version;
 	private final String base_Version = "release";
 	private Date date_Version ;
 	public String getMain_Version() {
@@ -31,11 +32,13 @@ public class Version implements Comparable{
 	public Version(String str){
 		int firstIndex = str.indexOf("_");
 		int secondIndex = str.indexOf("_", firstIndex+1);
+		int thirdIndex = str.indexOf("_", secondIndex+1);
 		this.main_Version = str.substring(0,firstIndex);
+		this.type_Version = str.substring(firstIndex+1,secondIndex);
 		//this.base_Version = str.getBase_Version();
 		SimpleDateFormat dateFormet = new SimpleDateFormat("yyyyMMdd");
 		try {
-			this.date_Version = dateFormet.parse(str.substring(secondIndex+1,str.length()));
+			this.date_Version = dateFormet.parse(str.substring(thirdIndex+1,str.length()));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,7 +77,7 @@ public class Version implements Comparable{
 	
 	public String toString(){
 		SimpleDateFormat dateFormet = new SimpleDateFormat("yyyyMMdd");
-		return this.getMain_Version() + "_" + this.getBase_Version() + "_" + dateFormet.format(this.getDate_Version());
+		return this.getMain_Version() + "_" + this.type_Version + "_" + this.getBase_Version() + "_" + dateFormet.format(this.getDate_Version());
 	}
 	
 	

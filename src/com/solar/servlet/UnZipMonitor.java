@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -22,9 +23,12 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServlet;
 
+import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileSize;
 import com.solar.utils.ReadFile;
+import com.solar.utils.TomcatUtil;
 import com.solar.utils.UnzipUtil;
+import com.solar.utils.WriteFileUtil;
 
 public class UnZipMonitor extends HttpServlet implements Runnable {
 
@@ -38,7 +42,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 		// 输出文件路径
 		String outPath = "D:/海图项目/zip5";
 		String filePath = ("D:/海图项目/通知文件/压缩文件");
-		String filePath2 = ("D:/海图项目/通知文件/解压文件");
+		String filePath2 = ("D:\\海图项目\\通知文件\\解压文件");
 		try {
 
 			// 获取文件系统的WatchService对象
@@ -74,13 +78,35 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 					if ((event.kind().toString()).equals("ENTRY_CREATE") || (event.kind().toString()).equals("ENTRY_MODIFY")) {
 						System.out.println(event.context() + " --> " + event.kind());
 						String zipPath = traverseFolder2(filePath);
+						Path path = (Path)key.watchable();
+						System.out.println(path.toString());
+						System.out.println(filePath2);
 						Thread.sleep(3000);
-						if(event.context().equals(filePath2)){
+						if((path.toString()).equals(filePath2)){
 							//更新
+							CopyFileUtil copyFileUtil = new CopyFileUtil();
+							ResourceBundle resourceBundle = ResourceBundle.getBundle("config/ship");
+							String webUrl = resourceBundle.getString("web");
+							webUrl = new String(webUrl.getBytes("ISO-8859-1"),"utf-8");
+							String unzipPath = resourceBundle.getString("unzipPath");
+							unzipPath = new String(unzipPath.getBytes("ISO-8859-1"),"utf-8");
+							copyFileUtil.copyDirectory(unzipPath, webUrl, true);
+							
+							//重启tomcat7
+							TomcatUtil tomcatUtil = new TomcatUtil();
+							tomcatUtil.stopTomcat();
 						}
 						//解压
-						else
+						else{
 							unzip(zipPath, outPath);
+						    WriteFileUtil writeFileUtil = new WriteFileUtil();
+						    ResourceBundle resourceBundle = ResourceBundle.getBundle("config/ship");
+						    String informUnzipFilePath = resourceBundle.getString("informUnzipFilePath");
+						    informUnzipFilePath = new String(informUnzipFilePath.getBytes("ISO-8859-1"),"utf-8");
+						    String unzipPath = resourceBundle.getString("unzipPath");
+						    unzipPath = new String(unzipPath.getBytes("ISO-8859-1"),"utf-8");
+						    writeFileUtil.writeInfoToFile(unzipPath, informUnzipFilePath);
+						}
 						// updateFile("","");
 					}
 					 System.out.println(event.kind() +"," + ((

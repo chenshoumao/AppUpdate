@@ -43,11 +43,14 @@ public class Zip extends HttpServlet {
     
     public static void main(String[] args) {
 		Zip zip = new Zip();
-		zip.zip("D:/海图项目/压缩包路径", "D:/海图项目/解压路径/TEST.zip");
+		zip.zip("D:/海图项目/临时文件/增量文件", "D:/海图项目/临时文件/压缩文件/TEST.zip");
 	}
+    
     
     public static boolean zip(String sourcePath, String outPutZipPath) {
     	boolean stateResult = false;
+    	
+    	outPutZipPath+="/" + "Test.zip";
 		try {
 			
 			// 文件输出流
@@ -71,6 +74,7 @@ public class Zip extends HttpServlet {
 			checkOut.close();
 		} catch (Exception e) {
 			// TODO: handle exception
+			System.out.println(e);
 		}
 		return stateResult;
 	}

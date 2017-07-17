@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
+encoding//src/com/solar/dao/impl/ShipDaoImpl.java=UTF-8
+encoding//src/config/path.properties=UTF-8
 encoding//src/config/ship.properties=UTF-8

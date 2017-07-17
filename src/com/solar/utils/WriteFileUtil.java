@@ -16,11 +16,11 @@ public class WriteFileUtil {
 			if (!txt.exists()) {
 				txt.createNewFile();
 			}
-			byte bytes[] = new byte[512];
+			byte bytes[] = new byte[1024];
 			bytes = info.getBytes(); // 新加的
 			int b = info.length(); // 改
 			FileOutputStream fos = new FileOutputStream(txt);
-			fos.write(bytes, 0, b);
+			fos.write(bytes);
 			fos.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
