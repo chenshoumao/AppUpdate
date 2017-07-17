@@ -20,10 +20,10 @@ public class ShipDaoImpl implements ShipDao {
 	private final String  VERSION = "version.txt";
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @Time 2017-07-14
-	 * @Function ´¬¶ËÇëÇó¸üĞÂ
-	 * @param json,ÊÇ°æ±¾ĞÅÏ¢µÄ¸ñÊ½»¯×Ö·û´®£¬°üÀ¨´¬¶ËµÄ°æ±¾£¬°¶¶ËµÄ°æ±¾
+	 * @Function èˆ¹ç«¯è¯·æ±‚æ›´æ–°
+	 * @param json,æ˜¯ç‰ˆæœ¬ä¿¡æ¯çš„æ ¼å¼åŒ–å­—ç¬¦ä¸²ï¼ŒåŒ…æ‹¬èˆ¹ç«¯çš„ç‰ˆæœ¬ï¼Œå²¸ç«¯çš„ç‰ˆæœ¬11
 	 */
 	@Override
 	public Map<String, Object> updateVersion(String json) {
@@ -33,10 +33,10 @@ public class ShipDaoImpl implements ShipDao {
 	}
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @Time 2017-07-14
-	 * @Funtion »ñÈ¡´¬¶ËµÄ°æ±¾µÄĞÅÏ¢
-	 * @param key,Ò»¸ö×Ö·û´®Êı¾İ£¬¼´ÏëÒª¸üĞÂµÄ×é¼şµÄ¹Ø¼ü×Ö
+	 * @Funtion è·å–èˆ¹ç«¯çš„ç‰ˆæœ¬çš„ä¿¡æ¯
+	 * @param key,ä¸€ä¸ªå­—ç¬¦ä¸²æ•°æ®ï¼Œå³æƒ³è¦æ›´æ–°çš„ç»„ä»¶çš„å…³é”®å­—
 	 */
 	@Override
 	public Map<String, Object> getShipVersion(String[] key) {
