@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import javax.swing.JOptionPane;  
   
 /** 
- * ¸´ÖÆÎÄ¼ş»òÎÄ¼ş¼Ğ 
+ * å¤åˆ¶æ–‡ä»¶æˆ–æ–‡ä»¶å¤¹ 
  *  
  * zww 
  */  
@@ -20,54 +20,54 @@ public class CopyFileUtil {
     private static String MESSAGE = "";  
   
     /** 
-     * ¸´ÖÆµ¥¸öÎÄ¼ş 
+     * å¤åˆ¶å•ä¸ªæ–‡ä»¶ 
      *  
      * @param srcFileName 
-     *            ´ı¸´ÖÆµÄÎÄ¼şÃû 
+     *            å¾…å¤åˆ¶çš„æ–‡ä»¶å 
      * @param descFileName 
-     *            Ä¿±êÎÄ¼şÃû 
+     *            ç›®æ ‡æ–‡ä»¶å 
      * @param overlay 
-     *            Èç¹ûÄ¿±êÎÄ¼ş´æÔÚ£¬ÊÇ·ñ¸²¸Ç 
-     * @return Èç¹û¸´ÖÆ³É¹¦·µ»Øtrue£¬·ñÔò·µ»Øfalse 
+     *            å¦‚æœç›®æ ‡æ–‡ä»¶å­˜åœ¨ï¼Œæ˜¯å¦è¦†ç›– 
+     * @return å¦‚æœå¤åˆ¶æˆåŠŸè¿”å›trueï¼Œå¦åˆ™è¿”å›false 
      */  
     public static boolean copyFile(String srcFileName, String destFileName,  
             boolean overlay) {  
         File srcFile = new File(srcFileName);  
         
-        // ÅĞ¶ÏÔ´ÎÄ¼şÊÇ·ñ´æÔÚ  
+        // åˆ¤æ–­æºæ–‡ä»¶æ˜¯å¦å­˜åœ¨  
         if (!srcFile.exists()) {  
-            MESSAGE = "Ô´ÎÄ¼ş£º" + srcFileName + "²»´æÔÚ£¡";  
+            MESSAGE = "æºæ–‡ä»¶ï¼š" + srcFileName + "ä¸å­˜åœ¨ï¼";  
            // JOptionPane.showMessageDialog(null, MESSAGE);  
             System.out.println(MESSAGE);
             return false;  
         } else if (!srcFile.isFile()) {  
-            MESSAGE = "¸´ÖÆÎÄ¼şÊ§°Ü£¬Ô´ÎÄ¼ş£º" + srcFileName + "²»ÊÇÒ»¸öÎÄ¼ş£¡";  
+            MESSAGE = "å¤åˆ¶æ–‡ä»¶å¤±è´¥ï¼Œæºæ–‡ä»¶ï¼š" + srcFileName + "ä¸æ˜¯ä¸€ä¸ªæ–‡ä»¶ï¼";  
           //  JOptionPane.showMessageDialog(null, MESSAGE);  
             System.out.println(MESSAGE);
             return false;  
         }  
   
-        // ÅĞ¶ÏÄ¿±êÎÄ¼şÊÇ·ñ´æÔÚ  
+        // åˆ¤æ–­ç›®æ ‡æ–‡ä»¶æ˜¯å¦å­˜åœ¨  
         File destFile = new File(destFileName);   
         if (destFile.exists()) {  
-            // Èç¹ûÄ¿±êÎÄ¼ş´æÔÚ²¢ÔÊĞí¸²¸Ç  
+            // å¦‚æœç›®æ ‡æ–‡ä»¶å­˜åœ¨å¹¶å…è®¸è¦†ç›–  
             if (overlay) {  
-                // É¾³ıÒÑ¾­´æÔÚµÄÄ¿±êÎÄ¼ş£¬ÎŞÂÛÄ¿±êÎÄ¼şÊÇÄ¿Â¼»¹ÊÇµ¥¸öÎÄ¼ş  
+                // åˆ é™¤å·²ç»å­˜åœ¨çš„ç›®æ ‡æ–‡ä»¶ï¼Œæ— è®ºç›®æ ‡æ–‡ä»¶æ˜¯ç›®å½•è¿˜æ˜¯å•ä¸ªæ–‡ä»¶  
                 new File(destFileName).delete();  
             }  
         } else {  
-            // Èç¹ûÄ¿±êÎÄ¼şËùÔÚÄ¿Â¼²»´æÔÚ£¬Ôò´´½¨Ä¿Â¼  
+            // å¦‚æœç›®æ ‡æ–‡ä»¶æ‰€åœ¨ç›®å½•ä¸å­˜åœ¨ï¼Œåˆ™åˆ›å»ºç›®å½•  
             if (!destFile.getParentFile().exists()) {  
-                // Ä¿±êÎÄ¼şËùÔÚÄ¿Â¼²»´æÔÚ  
+                // ç›®æ ‡æ–‡ä»¶æ‰€åœ¨ç›®å½•ä¸å­˜åœ¨  
                 if (!destFile.getParentFile().mkdirs()) {  
-                    // ¸´ÖÆÎÄ¼şÊ§°Ü£º´´½¨Ä¿±êÎÄ¼şËùÔÚÄ¿Â¼Ê§°Ü  
+                    // å¤åˆ¶æ–‡ä»¶å¤±è´¥ï¼šåˆ›å»ºç›®æ ‡æ–‡ä»¶æ‰€åœ¨ç›®å½•å¤±è´¥  
                     return false;  
                 }  
             }  
         }  
   
-        // ¸´ÖÆÎÄ¼ş  
-        int byteread = 0; // ¶ÁÈ¡µÄ×Ö½ÚÊı  
+        // å¤åˆ¶æ–‡ä»¶  
+        int byteread = 0; // è¯»å–çš„å­—èŠ‚æ•°  
         InputStream in = null;  
         OutputStream out = null;   
         try {  
@@ -95,53 +95,53 @@ public class CopyFileUtil {
     }  
   
     /** 
-     * ¸´ÖÆÕû¸öÄ¿Â¼µÄÄÚÈİ 
+     * å¤åˆ¶æ•´ä¸ªç›®å½•çš„å†…å®¹ 
      *  
      * @param srcDirName 
-     *            ´ı¸´ÖÆÄ¿Â¼µÄÄ¿Â¼Ãû 
+     *            å¾…å¤åˆ¶ç›®å½•çš„ç›®å½•å 
      * @param destDirName 
-     *            Ä¿±êÄ¿Â¼Ãû 
+     *            ç›®æ ‡ç›®å½•å 
      * @param overlay 
-     *            Èç¹ûÄ¿±êÄ¿Â¼´æÔÚ£¬ÊÇ·ñ¸²¸Ç 
-     * @return Èç¹û¸´ÖÆ³É¹¦·µ»Øtrue£¬·ñÔò·µ»Øfalse 
+     *            å¦‚æœç›®æ ‡ç›®å½•å­˜åœ¨ï¼Œæ˜¯å¦è¦†ç›– 
+     * @return å¦‚æœå¤åˆ¶æˆåŠŸè¿”å›trueï¼Œå¦åˆ™è¿”å›false 
      */  
     public static boolean copyDirectory(String srcDirName, String destDirName,  
             boolean overlay) {  
-        // ÅĞ¶ÏÔ´Ä¿Â¼ÊÇ·ñ´æÔÚ  
+        // åˆ¤æ–­æºç›®å½•æ˜¯å¦å­˜åœ¨  
         File srcDir = new File(srcDirName);  
         if (!srcDir.exists()) {  
-            MESSAGE = "¸´ÖÆÄ¿Â¼Ê§°Ü£ºÔ´Ä¿Â¼" + srcDirName + "²»´æÔÚ£¡";  
+            MESSAGE = "å¤åˆ¶ç›®å½•å¤±è´¥ï¼šæºç›®å½•" + srcDirName + "ä¸å­˜åœ¨ï¼";  
             //JOptionPane.showMessageDialog(null, MESSAGE);  
             System.out.println(MESSAGE);
             return false;  
         } else if (!srcDir.isDirectory()) {  
-            MESSAGE = "¸´ÖÆÄ¿Â¼Ê§°Ü£º" + srcDirName + "²»ÊÇÄ¿Â¼£¡";  
+            MESSAGE = "å¤åˆ¶ç›®å½•å¤±è´¥ï¼š" + srcDirName + "ä¸æ˜¯ç›®å½•ï¼";  
        //     JOptionPane.showMessageDialog(null, MESSAGE);  
             System.out.println(MESSAGE);
             return false;  
         }  
   
-        // Èç¹ûÄ¿±êÄ¿Â¼Ãû²»ÊÇÒÔÎÄ¼ş·Ö¸ô·û½áÎ²£¬Ôò¼ÓÉÏÎÄ¼ş·Ö¸ô·û  
+        // å¦‚æœç›®æ ‡ç›®å½•åä¸æ˜¯ä»¥æ–‡ä»¶åˆ†éš”ç¬¦ç»“å°¾ï¼Œåˆ™åŠ ä¸Šæ–‡ä»¶åˆ†éš”ç¬¦  
         if (!destDirName.endsWith(File.separator)) {  
             destDirName = destDirName + File.separator;  
         }  
         File destDir = new File(destDirName);  
-        // Èç¹ûÄ¿±êÎÄ¼ş¼Ğ´æÔÚ  
+        // å¦‚æœç›®æ ‡æ–‡ä»¶å¤¹å­˜åœ¨  
         if (destDir.exists()) {  
-            // Èç¹ûÔÊĞí¸²¸ÇÔòÉ¾³ıÒÑ´æÔÚµÄÄ¿±êÄ¿Â¼  
+            // å¦‚æœå…è®¸è¦†ç›–åˆ™åˆ é™¤å·²å­˜åœ¨çš„ç›®æ ‡ç›®å½•  
             if (overlay) {  
                 new File(destDirName).delete();  
             } else {  
-                MESSAGE = "¸´ÖÆÄ¿Â¼Ê§°Ü£ºÄ¿µÄÄ¿Â¼" + destDirName + "ÒÑ´æÔÚ£¡";  
+                MESSAGE = "å¤åˆ¶ç›®å½•å¤±è´¥ï¼šç›®çš„ç›®å½•" + destDirName + "å·²å­˜åœ¨ï¼";  
                // JOptionPane.showMessageDialog(null, MESSAGE);  
                 System.out.println(MESSAGE);
                 return false;  
             }  
         } else {  
-            // ´´½¨Ä¿µÄÄ¿Â¼  
-            System.out.println("Ä¿µÄÄ¿Â¼²»´æÔÚ£¬×¼±¸´´½¨¡£¡£¡£");  
+            // åˆ›å»ºç›®çš„ç›®å½•  
+            System.out.println("ç›®çš„ç›®å½•ä¸å­˜åœ¨ï¼Œå‡†å¤‡åˆ›å»ºã€‚ã€‚ã€‚");  
             if (!destDir.mkdirs()) {  
-                System.out.println("¸´ÖÆÄ¿Â¼Ê§°Ü£º´´½¨Ä¿µÄÄ¿Â¼Ê§°Ü£¡");  
+                System.out.println("å¤åˆ¶ç›®å½•å¤±è´¥ï¼šåˆ›å»ºç›®çš„ç›®å½•å¤±è´¥ï¼");  
                 return false;  
             }  
         }  
@@ -149,7 +149,7 @@ public class CopyFileUtil {
         boolean flag = true;  
         File[] files = srcDir.listFiles();  
         for (int i = 0; i < files.length; i++) {  
-            // ¸´ÖÆÎÄ¼ş  
+            // å¤åˆ¶æ–‡ä»¶  
             if (files[i].isFile()) {  
                 flag = CopyFileUtil.copyFile(files[i].getAbsolutePath(),  
                         destDirName + files[i].getName(), overlay);  
@@ -163,7 +163,7 @@ public class CopyFileUtil {
             }  
         }  
         if (!flag) {  
-            MESSAGE = "¸´ÖÆÄ¿Â¼" + srcDirName + "ÖÁ" + destDirName + "Ê§°Ü£¡";  
+            MESSAGE = "å¤åˆ¶ç›®å½•" + srcDirName + "è‡³" + destDirName + "å¤±è´¥ï¼";  
            // JOptionPane.showMessageDialog(null, MESSAGE);  
             System.out.println(MESSAGE);
             return false;  
@@ -173,8 +173,8 @@ public class CopyFileUtil {
     }  
   
     public static void main(String[] args) {  
-        String srcDirName = "D:\\º£Í¼ÏîÄ¿\\zip\\ĞÂ½¨ÎÄ¼ş¼Ğ\\ĞÂ½¨ÎÄ¼ş¼Ğ\\222.txt";  
-        String destDirName = "D:\\º£Í¼ÏîÄ¿\\zip2\\ĞÂ½¨ÎÄ¼ş¼Ğ\\ĞÂ½¨ÎÄ¼ş¼Ğ\\222.txt";  
+        String srcDirName = "D:\\æµ·å›¾é¡¹ç›®\\zip\\æ–°å»ºæ–‡ä»¶å¤¹\\æ–°å»ºæ–‡ä»¶å¤¹\\222.txt";  
+        String destDirName = "D:\\æµ·å›¾é¡¹ç›®\\zip2\\æ–°å»ºæ–‡ä»¶å¤¹\\æ–°å»ºæ–‡ä»¶å¤¹\\222.txt";  
         CopyFileUtil.copyFile(srcDirName, destDirName, true);  
     }  
 }  

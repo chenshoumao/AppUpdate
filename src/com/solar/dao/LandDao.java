@@ -9,7 +9,7 @@ public interface LandDao {
 	
 	public Map<String,Object> analysisVersion(String versionInfo);
 	
-	public Map<String, Object> versionFilter(String key,Map<String, String> shipVerionMap,String moduleVersionOfLand);
+	public Map<String, Object> versionFilter(String key,List<String> keyList,String shipVerion,String moduleVersionOfLand);
 	
 	public List<Version> getVersionFromPath(String path);
 	

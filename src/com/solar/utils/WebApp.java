@@ -2,18 +2,18 @@ package com.solar.utils;
 
 /**
  * Created by Administrator on 2015/10/20.
- * webAppµÄÏà¹ØĞÅÏ¢
+ * webAppçš„ç›¸å…³ä¿¡æ¯
  */
 
 public class WebApp {
 
     /**
-     * ÏîÄ¿Ãû³Æ
+     * é¡¹ç›®åç§°
      */
     private String name;
 
     /**
-     * ÔËĞĞ×´Ì¬ "³É¹¦" or "Í£Ö¹"
+     * è¿è¡ŒçŠ¶æ€ "æˆåŠŸ" or "åœæ­¢"
      */
     private String status;
 

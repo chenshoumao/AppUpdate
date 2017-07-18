@@ -17,8 +17,8 @@ public class WriteFileUtil {
 				txt.createNewFile();
 			}
 			byte bytes[] = new byte[1024];
-			bytes = info.getBytes(); // ÐÂ¼ÓµÄ
-			int b = info.length(); // ¸Ä
+			bytes = info.getBytes(); // æ–°åŠ çš„
+			int b = info.length(); // æ”¹
 			FileOutputStream fos = new FileOutputStream(txt);
 			fos.write(bytes);
 			fos.close();
@@ -39,8 +39,8 @@ public class WriteFileUtil {
 			txt.createNewFile();
 		}
 		byte bytes[] = new byte[512];
-		bytes = str.getBytes(); // ÐÂ¼ÓµÄ
-		int b = str.length(); // ¸Ä
+		bytes = str.getBytes(); // æ–°åŠ çš„
+		int b = str.length(); // æ”¹
 		FileOutputStream fos = new FileOutputStream(txt);
 		fos.write(bytes, 0, b);
 		fos.close();

@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class MD5 {
-	    // ¼ÆËãÎÄ¼þµÄ MD5 Öµ
+	    // è®¡ç®—æ–‡ä»¶çš„ MD5 å€¼
 		public static String getFileMD5(File file) {
 		    if (!file.isFile()) {
 		        return null;

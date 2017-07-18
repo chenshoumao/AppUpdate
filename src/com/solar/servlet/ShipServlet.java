@@ -44,9 +44,9 @@ public class ShipServlet extends HttpServlet {
 		try {
 			osSystem = Class.forName("com.solar.servlet.ShipServlet");
 			Object obj = osSystem.newInstance();
-			// »ñÈ¡·½·¨
+			// è·å–æ–¹æ³•
 			Method m = obj.getClass().getDeclaredMethod(action, String.class);
-			// µ÷ÓÃ·½·¨
+			// è°ƒç”¨æ–¹æ³•
 			m.invoke(obj, part);
 
 		} catch (Exception e1) {
@@ -63,12 +63,12 @@ public class ShipServlet extends HttpServlet {
 		   try {
 		      osSystem = Class.forName("com.solar.servlet.ShipServlet");
 		      Object obj = osSystem.newInstance();
-		      //»ñÈ¡·½·¨  
+		      //è·å–æ–¹æ³•  
 		      Method m = obj.getClass().getDeclaredMethod(method1, String.class);
-		      //µ÷ÓÃ·½·¨  
+		      //è°ƒç”¨æ–¹æ³•  
 		     m.invoke(obj, name);
 		     
-		     //»ñÈ¡·½·¨  
+		     //è·å–æ–¹æ³•  
 		      Method m2 = obj.getClass().getDeclaredMethod(method1, String.class,String.class);
 		     m2.invoke(obj, name,sex);
 		     
@@ -89,16 +89,16 @@ public class ShipServlet extends HttpServlet {
 	}
 	
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @Time 2017-07-14
-	 * @Funtion ´¬¶Ë¸üĞÂ°æ±¾
+	 * @Funtion èˆ¹ç«¯æ›´æ–°ç‰ˆæœ¬
 	 * 
 	 */
 	public Map<String, Object> getLocalVersion(String part){
 		Map<String, Object> map = new HashMap<String,Object>();
-		//»ñÈ¡ÏëÒª¸üĞÂµÄ×é¼şµÄĞÅÏ¢ 
+		//è·å–æƒ³è¦æ›´æ–°çš„ç»„ä»¶çš„ä¿¡æ¯ 
 		String[] updatePart = part.split(","); 
-		//»ñÈ¡±¾µØ¶ÔÓ¦µÄ×é¼şµÄ°æ±¾ĞÅÏ¢
+		//è·å–æœ¬åœ°å¯¹åº”çš„ç»„ä»¶çš„ç‰ˆæœ¬ä¿¡æ¯
 		ShipDao dao =  new ShipDaoImpl();
 		Map<String, Object> shipVersion = dao.getShipVersion(updatePart); 
 		return map;

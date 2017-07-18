@@ -25,13 +25,13 @@ public class Zip extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	
-	String filePath = ("D:\\º£Í¼ÏîÄ¿\\zip");
+	String filePath = ("D:\\æµ·å›¾é¡¹ç›®\\zip");
 
-	// ÒªÑ¹ËõµÄ ÎÄ¼ş¼Ğ Â·¾¶
-	String sourcePath = "D:/º£Í¼ÏîÄ¿/zip2";
+	// è¦å‹ç¼©çš„ æ–‡ä»¶å¤¹ è·¯å¾„
+	String sourcePath = "D:/æµ·å›¾é¡¹ç›®/zip2";
 
-	// Ñ¹ËõÎÄ¼ş¼ĞÂ·¾¶
-	String outPutZipPath = "D:/º£Í¼ÏîÄ¿/zip3/zip.zip"; 
+	// å‹ç¼©æ–‡ä»¶å¤¹è·¯å¾„
+	String outPutZipPath = "D:/æµ·å›¾é¡¹ç›®/zip3/zip.zip"; 
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -43,7 +43,7 @@ public class Zip extends HttpServlet {
     
     public static void main(String[] args) {
 		Zip zip = new Zip();
-		zip.zip("D:/º£Í¼ÏîÄ¿/ÁÙÊ±ÎÄ¼ş/ÔöÁ¿ÎÄ¼ş", "D:/º£Í¼ÏîÄ¿/ÁÙÊ±ÎÄ¼ş/Ñ¹ËõÎÄ¼ş/TEST.zip");
+		zip.zip("D:/æµ·å›¾é¡¹ç›®/ä¸´æ—¶æ–‡ä»¶/å¢é‡æ–‡ä»¶", "D:/æµ·å›¾é¡¹ç›®/ä¸´æ—¶æ–‡ä»¶/å‹ç¼©æ–‡ä»¶/TEST.zip");
 	}
     
     
@@ -53,18 +53,18 @@ public class Zip extends HttpServlet {
     	outPutZipPath+="/" + "Test.zip";
 		try {
 			
-			// ÎÄ¼şÊä³öÁ÷
+			// æ–‡ä»¶è¾“å‡ºæµ
 			FileOutputStream fout = new FileOutputStream(outPutZipPath);
 
-			// ĞèÒªÎ¬»¤Ğ´ÈëÊı¾İĞ£ÑéºÍµÄÊä³öÁ÷¡£Ğ£ÑéºÍ¿ÉÓÃÓÚÑéÖ¤Êä³öÊı¾İµÄÍêÕûĞÔ¡£
+			// éœ€è¦ç»´æŠ¤å†™å…¥æ•°æ®æ ¡éªŒå’Œçš„è¾“å‡ºæµã€‚æ ¡éªŒå’Œå¯ç”¨äºéªŒè¯è¾“å‡ºæ•°æ®çš„å®Œæ•´æ€§ã€‚
 			CheckedOutputStream checkOut = new CheckedOutputStream(fout, new CRC32());
-			// zip¸ñÊ½Êä³öÁ÷
+			// zipæ ¼å¼è¾“å‡ºæµ
 			ZipOutputStream zipOput = new ZipOutputStream(checkOut);
 
-			// ½«Ò»¸öÔ´ÎÄ¼şĞ´Èëµ½Ò»¸öÑ¹ËõÎÄ¼şÖĞ
+			// å°†ä¸€ä¸ªæºæ–‡ä»¶å†™å…¥åˆ°ä¸€ä¸ªå‹ç¼©æ–‡ä»¶ä¸­
 			File sourceFile = new File(sourcePath);
 
-			// Ñ¹ËõÌõÄ¿
+			// å‹ç¼©æ¡ç›®
 			String zipEntryName = "";
 			stateResult = zipDire(zipOput, sourceFile, zipEntryName);
 			zipOput.closeEntry();
@@ -79,13 +79,13 @@ public class Zip extends HttpServlet {
 		return stateResult;
 	}
 
-	// Ñ¹ËõÄ¿Â¼
+	// å‹ç¼©ç›®å½•
 	public static boolean zipDire(ZipOutputStream zipOput, File sourceFile, String zipEntryName)
 			throws IOException, FileNotFoundException {
 		boolean stateResult = false;
 		try {
 			for (File file : sourceFile.listFiles()) {
-				// String name = sourcePath + "/" + "ÏÂÔØ±Ø¿´/" + file.getName() ;
+				// String name = sourcePath + "/" + "ä¸‹è½½å¿…çœ‹/" + file.getName() ;
 				if(!zipEntryName.equals(""))
 					zipEntryName = zipEntryName + "/";
 				if (file.isFile())
@@ -107,13 +107,13 @@ public class Zip extends HttpServlet {
 
 	}
 
-	// Ñ¹ËõÎÄ¼ş
+	// å‹ç¼©æ–‡ä»¶
 	public static void ZipFile(String sourcePath, ZipOutputStream zipOput, String zipEntryName)
 			throws IOException, FileNotFoundException {
-		// ½²Ò»¸öÒªÑ¹ËõµÄÎÄ¼şĞ´Èëµ½Ñ¹ËõÌõÄ¿ÖĞ
+		// è®²ä¸€ä¸ªè¦å‹ç¼©çš„æ–‡ä»¶å†™å…¥åˆ°å‹ç¼©æ¡ç›®ä¸­
 		zipOput.putNextEntry(new ZipEntry(zipEntryName));
 
-		// ¶ÁÈëÒªÑ¹ËõµÄÎÄ¼ş
+		// è¯»å…¥è¦å‹ç¼©çš„æ–‡ä»¶
 		FileInputStream fileInput = new FileInputStream(sourcePath);
 
 		byte[] buff = new byte[1024];

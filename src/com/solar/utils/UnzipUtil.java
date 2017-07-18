@@ -18,20 +18,20 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtil {
 
 	/**
-	 * @author ³ÂÊØÃ²
+	 * @author é™ˆå®ˆè²Œ
 	 * @Time 2017-07-14
-	 * @Funtion ½âÑ¹µÄ´úÂë
+	 * @Funtion è§£å‹çš„ä»£ç 
 	 * @param sourcePath
-	 *            Ñ¹Ëõ°üËùÔÚµÄÂ·¾¶
+	 *            å‹ç¼©åŒ…æ‰€åœ¨çš„è·¯å¾„
 	 * @param outPath
-	 *            ½âÑ¹µÄºóÎÄ¼şµÄ´æ·ÅÂ·¾¶
+	 *            è§£å‹çš„åæ–‡ä»¶çš„å­˜æ”¾è·¯å¾„
 	 */
 	public static boolean unzip(String sourcePath, String outPath) {
 		boolean stateResult = false;
 
 		long zipFileSize = 0;
 		try {
-			// ÎÄ¼şÊäÈëÁ÷
+			// æ–‡ä»¶è¾“å…¥æµ
 			FileInputStream fin = null;
 
 			int runCount = 0;
@@ -57,14 +57,14 @@ public class UnzipUtil {
 			}
 
 			if (stateResult) {
-				// ĞèÒªÎ¬»¤Ëù¶ÁÈ¡Êı¾İĞ£ÑéºÍµÄÊäÈëÁ÷¡£Ğ£ÑéºÍ¿ÉÓÃÓÚÑéÖ¤ÊäÈëÊı¾İµÄÍêÕûĞÔ
+				// éœ€è¦ç»´æŠ¤æ‰€è¯»å–æ•°æ®æ ¡éªŒå’Œçš„è¾“å…¥æµã€‚æ ¡éªŒå’Œå¯ç”¨äºéªŒè¯è¾“å…¥æ•°æ®çš„å®Œæ•´æ€§
 				CheckedInputStream checkIn = new CheckedInputStream(fin, new CRC32());
-				// Ö¸¶¨±àÂë ·ñÔò»á³öÏÖÖĞÎÄÎÄ¼ş½âÑ¹´íÎó
+				// æŒ‡å®šç¼–ç  å¦åˆ™ä¼šå‡ºç°ä¸­æ–‡æ–‡ä»¶è§£å‹é”™è¯¯
 				Charset gbk = Charset.forName("GBK");
-				// zip¸ñÊ½µÄÊäÈëÁ÷
+				// zipæ ¼å¼çš„è¾“å…¥æµ
 				ZipInputStream zin = new ZipInputStream(checkIn, gbk);
 
-				// ±éÀúÑ¹ËõÎÄ¼şÖĞµÄËùÓĞÑ¹ËõÌõÄ¿
+				// éå†å‹ç¼©æ–‡ä»¶ä¸­çš„æ‰€æœ‰å‹ç¼©æ¡ç›®
 				ZipEntry zinEntry;
 
 				while ((zinEntry = zin.getNextEntry()) != null) {
@@ -99,10 +99,10 @@ public class UnzipUtil {
 				Thread.sleep(4000);
 				File file = new File(sourcePath);
 
-				// É¾³ıµôÑ¹Ëõ°ü
+				// åˆ é™¤æ‰å‹ç¼©åŒ…
 				// if (file.exists())
 				// file.delete();
-				// File afterUnZip5 = new File("D:\\º£Í¼ÏîÄ¿\\zip5");
+				// File afterUnZip5 = new File("D:\\æµ·å›¾é¡¹ç›®\\zip5");
 
 				// long afterUnZip5Size = fileSize.getFileSize(afterUnZip5);
 				// long preUnZip5Size = zipFileSize;
@@ -116,10 +116,10 @@ public class UnzipUtil {
 			System.out.println(e);
 		}
 		if (stateResult) {
-			System.out.println("½âÑ¹Êı¾İ³É¹¦");
+			System.out.println("è§£å‹æ•°æ®æˆåŠŸ");
 			stateResult = true;
 		} else {
-			System.out.println("½âÑ¹Êı¾İÊ§°Ü");
+			System.out.println("è§£å‹æ•°æ®å¤±è´¥");
 			stateResult = false;
 		}
 		return stateResult;
@@ -129,15 +129,15 @@ public class UnzipUtil {
 	public Map<String, Object> updateDir() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
-			//¸üĞÂ´úÂë
+			//æ›´æ–°ä»£ç 
 			overideUpdate("");
-			//¸üĞÂº£Í¼
+			//æ›´æ–°æµ·å›¾
 			overideUpdate("haitu");
-			//¸üĞÂµ×Í¼
+			//æ›´æ–°åº•å›¾
 			overideUpdate("ditu");
-			//¸üĞÂÅäÖÃ
+			//æ›´æ–°é…ç½®
 			//...
-			//¸üĞÂÊı¾İ¿â
+			//æ›´æ–°æ•°æ®åº“
 			//...
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -145,7 +145,7 @@ public class UnzipUtil {
 		return map;
 	}
 
-	// ÒÔ¸²¸ÇµÄĞÎÊ½¸üĞÂ ´Ë²¿·Ö°üÀ¨´úÂë£¬Í¼
+	// ä»¥è¦†ç›–çš„å½¢å¼æ›´æ–° æ­¤éƒ¨åˆ†åŒ…æ‹¬ä»£ç ï¼Œå›¾
 	public Map<String, Object> overideUpdate(String key) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		boolean result = false;
@@ -153,20 +153,20 @@ public class UnzipUtil {
 
 			ResourceBundle resouce = ResourceBundle.getBundle("config/ship");
 
-			// »ñÈ¡ÏîÄ¿µÄÂ·¾¶
+			// è·å–é¡¹ç›®çš„è·¯å¾„
 			String sourcePath = null;
 			if(!key.equals(""))
 				sourcePath = resouce.getString("web") + File.separator + key;
 			else
 				sourcePath = resouce.getString("web");
-			//»ñÈ¡×îĞÂ½âÑ¹µÄÎÄ¼ş¼Ğ
+			//è·å–æœ€æ–°è§£å‹çš„æ–‡ä»¶å¤¹
 			ReadFile readFile = new ReadFile();
 			String filePath = resouce.getString("informUnzipFilePath");
 			String unzipFileName = readFile.readLastLine(new File(filePath), "utf-8");
-			// »ñÈ¡½âÑ¹Â·¾¶ÖĞÒª»ñÈ¡µÄÄÚÈİµÄÂ·¾¶
+			// è·å–è§£å‹è·¯å¾„ä¸­è¦è·å–çš„å†…å®¹çš„è·¯å¾„
 			String unzipPath = resouce.getString("unzipPath") + File.separator + unzipFileName + File.separator + resouce.getString(key);
 
-			// Ö±½Ó¸²¸Ç
+			// ç›´æ¥è¦†ç›–
 			CopyFileUtil copyUtil = new CopyFileUtil();
 			result = copyUtil.copyDirectory(unzipPath, sourcePath, true);
 
@@ -181,7 +181,7 @@ public class UnzipUtil {
 	
 
 	public static void main(String[] args) {
-		File file = new File("D:/º£Í¼ÏîÄ¿/Í¨ÖªÎÄ¼ş/½âÑ¹ÎÄ¼ş/inform.txt");
+		File file = new File("D:/æµ·å›¾é¡¹ç›®/é€šçŸ¥æ–‡ä»¶/è§£å‹æ–‡ä»¶/inform.txt");
 
 		RandomAccessFile raf = null;
 		try {

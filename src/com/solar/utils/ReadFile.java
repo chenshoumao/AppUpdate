@@ -9,32 +9,34 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ReadFile {
 	/**
-     * ÒÔĞĞÎªµ¥Î»¶ÁÈ¡ÎÄ¼ş£¬³£ÓÃÓÚ¶ÁÃæÏòĞĞµÄ¸ñÊ½»¯ÎÄ¼ş
+     * ä»¥è¡Œä¸ºå•ä½è¯»å–æ–‡ä»¶ï¼Œå¸¸ç”¨äºè¯»é¢å‘è¡Œçš„æ ¼å¼åŒ–æ–‡ä»¶
      */
     public static Map<String, Object> readFileByLines(String fileName) {
         File file = new File(fileName);
         Map<String, Object> result = new HashMap<String,Object>();
         BufferedReader reader = null;
         try {
-            System.out.println("ÒÔĞĞÎªµ¥Î»¶ÁÈ¡ÎÄ¼şÄÚÈİ£¬Ò»´Î¶ÁÒ»ÕûĞĞ£º");
+            System.out.println("ä»¥è¡Œä¸ºå•ä½è¯»å–æ–‡ä»¶å†…å®¹ï¼Œä¸€æ¬¡è¯»ä¸€æ•´è¡Œï¼š");
             reader = new BufferedReader(new FileReader(file));
+            String resultStr = "";
             String tempString = null;
             int line = 1;
-            // Ò»´Î¶ÁÈëÒ»ĞĞ£¬Ö±µ½¶ÁÈënullÎªÎÄ¼ş½áÊø
+            // ä¸€æ¬¡è¯»å…¥ä¸€è¡Œï¼Œç›´åˆ°è¯»å…¥nullä¸ºæ–‡ä»¶ç»“æŸ
             while ((tempString = reader.readLine()) != null) {
-                // ÏÔÊ¾ĞĞºÅ
+                // æ˜¾ç¤ºè¡Œå·
                 System.out.println("line " + line + ": " + tempString);
-                String[] str = tempString.split(":");
-                if(str.length == 2)
-                	result.put(str[0], str[1]);
-                else {
-					//Í¨Öª¼¼ÊõÈËÔ± ÃüÃû²»¹æ·¶
-				}
+                resultStr += tempString;
                 line++;
             }
             reader.close();
+            
+            ObjectMapper mapper = new ObjectMapper();
+            result = mapper.readValue(resultStr, HashMap.class);
+            
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -49,7 +51,7 @@ public class ReadFile {
     }
     
     
-    //¶ÁÈ¡ÎÄ¼şµÄ×îºóÒ»ĞĞµÄÄÚÈİ
+    //è¯»å–æ–‡ä»¶çš„æœ€åä¸€è¡Œçš„å†…å®¹
 	public static String readLastLine(File file, String charset) throws IOException {
 		if (!file.exists() || file.isDirectory() || !file.canRead()) {
 			return null;

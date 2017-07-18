@@ -11,7 +11,7 @@ import com.solar.bean.Version;
 
 public class VersionListUtil {
 	
-	//°æ±¾ÃüÃû¹æ·¶£¬Èç10.0.0_db_release_20170713£¬¿ÉÊÇ¿É·ÖÎªËÄ¸ö²¿·Ö
+	//ç‰ˆæœ¬å‘½åè§„èŒƒï¼Œå¦‚10.0.0_db_release_20170713ï¼Œå¯æ˜¯å¯åˆ†ä¸ºå››ä¸ªéƒ¨åˆ†
 	private static int length = 4;
 	
 	public List<Version> getVersionFromPath(String path){
@@ -22,22 +22,22 @@ public class VersionListUtil {
 			for(File fileIt:fileList){
 				String name = fileIt.getName();
 				String[] validateName = name.split("_");
-				//ÅĞ¶Ï°æ±¾µÄÃüÃûÊÇ·ñ¹æ·¶£¬ÈôÊÇ²»¹æ·¶£¬Òª¼°Ê±Í¨Öª¼¼ÊõÈËÔ±
+				//åˆ¤æ–­ç‰ˆæœ¬çš„å‘½åæ˜¯å¦è§„èŒƒï¼Œè‹¥æ˜¯ä¸è§„èŒƒï¼Œè¦åŠæ—¶é€šçŸ¥æŠ€æœ¯äººå‘˜
 				if(validateName.length == length)
 					list.add(new Version(name));
 				else{ 
-					System.out.println("ÃüÃû·Ç·¨£¡:  " + name);
-					//Í¨ÖªÏà¹ØÈËÔ±£¬°æ±¾¿âÃüÃû²»¹æ·¶
+					System.out.println("å‘½åéæ³•ï¼:  " + name);
+					//é€šçŸ¥ç›¸å…³äººå‘˜ï¼Œç‰ˆæœ¬åº“å‘½åä¸è§„èŒƒ
 				}
 			}
 		} 
 		Collections.sort(list);
 		return list;
-//		System.out.println("´òÓ¡ËùÓĞµÄ°æ±¾µÄĞÅÏ¢");
+//		System.out.println("æ‰“å°æ‰€æœ‰çš„ç‰ˆæœ¬çš„ä¿¡æ¯");
 //		for(Version verion:list){
 //			System.out.println(verion.toString());
 //		} 
-//		System.out.println("´òÓ¡ ×îĞÂµÄ°æ±¾");
+//		System.out.println("æ‰“å° æœ€æ–°çš„ç‰ˆæœ¬");
 //		System.out.println(list.get(0).toString()); 
 		
 		

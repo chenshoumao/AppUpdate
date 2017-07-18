@@ -26,26 +26,28 @@ import javax.servlet.http.HttpServlet;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileSize;
 import com.solar.utils.ReadFile;
+import com.solar.utils.ResouceBundleUtil;
+import com.solar.utils.SQLExcute;
 import com.solar.utils.TomcatUtil;
 import com.solar.utils.UnzipUtil;
 import com.solar.utils.WriteFileUtil;
 
 public class UnZipMonitor extends HttpServlet implements Runnable {
 
-	private static String updatePath = "D:/º£Í¼ÏîÄ¿/zip4";
+	private static String updatePath = "D:/æµ·å›¾é¡¹ç›®/zip4";
 	private static String sourceUpdatePath = "";
 
 	static FileSize fileSize = new FileSize();
 
 	public static void monitor() {
 
-		// Êä³öÎÄ¼şÂ·¾¶
-		String outPath = "D:/º£Í¼ÏîÄ¿/zip5";
-		String filePath = ("D:/º£Í¼ÏîÄ¿/Í¨ÖªÎÄ¼ş/Ñ¹ËõÎÄ¼ş");
-		String filePath2 = ("D:\\º£Í¼ÏîÄ¿\\Í¨ÖªÎÄ¼ş\\½âÑ¹ÎÄ¼ş");
+		// è¾“å‡ºæ–‡ä»¶è·¯å¾„
+		String outPath = "D:/æµ·å›¾é¡¹ç›®/zip5";
+		String filePath = ("D:/æµ·å›¾é¡¹ç›®/é€šçŸ¥æ–‡ä»¶/å‹ç¼©æ–‡ä»¶");
+		String filePath2 = ("D:\\æµ·å›¾é¡¹ç›®\\é€šçŸ¥æ–‡ä»¶\\è§£å‹æ–‡ä»¶");
 		try {
 
-			// »ñÈ¡ÎÄ¼şÏµÍ³µÄWatchService¶ÔÏó
+			// è·å–æ–‡ä»¶ç³»ç»Ÿçš„WatchServiceå¯¹è±¡
 			WatchService watchService = FileSystems.getDefault().newWatchService();
 
 			Paths.get(filePath).register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
@@ -53,7 +55,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 			Paths.get(filePath2).register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
 					StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
-			// ÈçÒª¼à¿Ø×ÓÎÄ¼ş
+			// å¦‚è¦ç›‘æ§å­æ–‡ä»¶
 			File file = new File(filePath);
 			LinkedList<File> fList = new LinkedList<File>();
 			fList.addLast(file);
@@ -62,9 +64,9 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 				if (f.listFiles() == null)
 					continue;
 				for (File file2 : f.listFiles()) {
-					if (file2.isDirectory()) {// ÏÂÒ»¼¶Ä¿Â¼
+					if (file2.isDirectory()) {// ä¸‹ä¸€çº§ç›®å½•
 						fList.addLast(file2);
-						// ÒÀ´Î×¢²á×ÓÄ¿Â¼
+						// ä¾æ¬¡æ³¨å†Œå­ç›®å½•
 						Paths.get(file2.getAbsolutePath()).register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
 								StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 					}
@@ -72,7 +74,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 			}
 
 			while (true) {
-				// »ñÈ¡ÏÂÒ»¸öÎÄ¼ş¸Ä¶¯ÊÂ¼ş
+				// è·å–ä¸‹ä¸€ä¸ªæ–‡ä»¶æ”¹åŠ¨äº‹ä»¶
 				WatchKey key = watchService.take();
 				for (WatchEvent<?> event : key.pollEvents()) {
 					if ((event.kind().toString()).equals("ENTRY_CREATE") || (event.kind().toString()).equals("ENTRY_MODIFY")) {
@@ -83,28 +85,36 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 						System.out.println(filePath2);
 						Thread.sleep(3000);
 						if((path.toString()).equals(filePath2)){
-							//¸üĞÂ
+							//æ›´æ–°
 							CopyFileUtil copyFileUtil = new CopyFileUtil();
-							ResourceBundle resourceBundle = ResourceBundle.getBundle("config/ship");
-							String webUrl = resourceBundle.getString("web");
-							webUrl = new String(webUrl.getBytes("ISO-8859-1"),"utf-8");
-							String unzipPath = resourceBundle.getString("unzipPath");
-							unzipPath = new String(unzipPath.getBytes("ISO-8859-1"),"utf-8");
+							ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
+							String webUrl = resourceBundle.getInfo("config/ship","web");  
+							String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
 							copyFileUtil.copyDirectory(unzipPath, webUrl, true);
 							
-							//ÖØÆôtomcat7
+							//åˆ¤æ–­å¢é‡æ–‡ä»¶ä¸­æ˜¯å¦æœ‰sqlæ–‡ä»¶
+							File fileScan = new File(unzipPath+File.separator + "db");
+							if(fileScan.exists()){
+								File[] sqlFileList = fileScan.listFiles();
+								for(File sqlFile:sqlFileList){
+									//æ›´æ–°æ•°æ®åº“
+									SQLExcute sqlExcute = new SQLExcute();
+									sqlExcute.updateDB(sqlFile);
+									
+								}
+							} 
+							
+							//é‡å¯tomcat7
 							TomcatUtil tomcatUtil = new TomcatUtil();
 							tomcatUtil.stopTomcat();
 						}
-						//½âÑ¹
+						//è§£å‹
 						else{
 							unzip(zipPath, outPath);
 						    WriteFileUtil writeFileUtil = new WriteFileUtil();
-						    ResourceBundle resourceBundle = ResourceBundle.getBundle("config/ship");
-						    String informUnzipFilePath = resourceBundle.getString("informUnzipFilePath");
-						    informUnzipFilePath = new String(informUnzipFilePath.getBytes("ISO-8859-1"),"utf-8");
-						    String unzipPath = resourceBundle.getString("unzipPath");
-						    unzipPath = new String(unzipPath.getBytes("ISO-8859-1"),"utf-8");
+						    ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
+						    String informUnzipFilePath = resourceBundle.getInfo("config/ship","informUnzipFilePath"); 
+						    String unzipPath = resourceBundle.getInfo("config/ship","unzipPath"); 
 						    writeFileUtil.writeInfoToFile(unzipPath, informUnzipFilePath);
 						}
 						// updateFile("","");
@@ -113,9 +123,9 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 					 event.kind().toString()).equals("ENTRY_CREATE")));
 
 				}
-				// ÖØÉèWatchKey
+				// é‡è®¾WatchKey
 				boolean valid = key.reset();
-				// Èç¹ûÖØÉèÊ§°Ü£¬ÍË³ö¼àÌı
+				// å¦‚æœé‡è®¾å¤±è´¥ï¼Œé€€å‡ºç›‘å¬
 				if (!valid) {
 					break;
 				}
@@ -133,22 +143,22 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 		if (file.exists()) {
 			File[] files = file.listFiles();
 			if (files.length == 0) {
-				System.out.println("ÎÄ¼ş¼ĞÊÇ¿ÕµÄ!");
+				System.out.println("æ–‡ä»¶å¤¹æ˜¯ç©ºçš„!");
 				return "";
 			} else {
 				for (File file2 : files) {
 					if (file2.isDirectory()) {
-						System.out.println("ÎÄ¼ş¼Ğ:" + file2.getAbsolutePath());
+						System.out.println("æ–‡ä»¶å¤¹:" + file2.getAbsolutePath());
 						return file2.getAbsolutePath();
 						// traverseFolder2(file2.getAbsolutePath());
 					} else {
-						System.out.println("ÎÄ¼ş:" + file2.getAbsolutePath());
+						System.out.println("æ–‡ä»¶:" + file2.getAbsolutePath());
 						return file2.getAbsolutePath();
 					}
 				}
 			}
 		} else {
-			System.out.println("ÎÄ¼ş²»´æÔÚ!");
+			System.out.println("æ–‡ä»¶ä¸å­˜åœ¨!");
 			return "";
 		}
 		return "";
@@ -197,7 +207,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 //			
 //			
 //
-//			// ÎÄ¼şÊäÈëÁ÷
+//			// æ–‡ä»¶è¾“å…¥æµ
 //			FileInputStream fin = null;
 //
 //			
@@ -229,14 +239,14 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 //			}
 //			
 //			
-//			// ĞèÒªÎ¬»¤Ëù¶ÁÈ¡Êı¾İĞ£ÑéºÍµÄÊäÈëÁ÷¡£Ğ£ÑéºÍ¿ÉÓÃÓÚÑéÖ¤ÊäÈëÊı¾İµÄÍêÕûĞÔ
+//			// éœ€è¦ç»´æŠ¤æ‰€è¯»å–æ•°æ®æ ¡éªŒå’Œçš„è¾“å…¥æµã€‚æ ¡éªŒå’Œå¯ç”¨äºéªŒè¯è¾“å…¥æ•°æ®çš„å®Œæ•´æ€§
 //			CheckedInputStream checkIn = new CheckedInputStream(fin, new CRC32());
-//			// Ö¸¶¨±àÂë ·ñÔò»á³öÏÖÖĞÎÄÎÄ¼ş½âÑ¹´íÎó
+//			// æŒ‡å®šç¼–ç  å¦åˆ™ä¼šå‡ºç°ä¸­æ–‡æ–‡ä»¶è§£å‹é”™è¯¯
 //			Charset gbk = Charset.forName("GBK");
-//			// zip¸ñÊ½µÄÊäÈëÁ÷
+//			// zipæ ¼å¼çš„è¾“å…¥æµ
 //			ZipInputStream zin = new ZipInputStream(checkIn, gbk);
 //
-//			// ±éÀúÑ¹ËõÎÄ¼şÖĞµÄËùÓĞÑ¹ËõÌõÄ¿
+//			// éå†å‹ç¼©æ–‡ä»¶ä¸­çš„æ‰€æœ‰å‹ç¼©æ¡ç›®
 //			ZipEntry zinEntry;
 //
 //			while ((zinEntry = zin.getNextEntry()) != null) {
@@ -273,18 +283,18 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 //
 //			if (file.exists())
 //				file.delete();
-//			File afterUnZip5 = new File("D:\\º£Í¼ÏîÄ¿\\zip5");
+//			File afterUnZip5 = new File("D:\\æµ·å›¾é¡¹ç›®\\zip5");
 //
 //			long afterUnZip5Size = fileSize.getFileSize(afterUnZip5);
 //			long preUnZip5Size = zipFileSize;
 //
 //			boolean resultState = preUnZip5Size == afterUnZip5Size;
 //			if (resultState){
-//				System.out.println("½âÑ¹Êı¾İ³É¹¦");
+//				System.out.println("è§£å‹æ•°æ®æˆåŠŸ");
 //				stateResult = true;
 //			}
 //			else{
-//				System.out.println("½âÑ¹Êı¾İËğÊ§");
+//				System.out.println("è§£å‹æ•°æ®æŸå¤±");
 //				stateResult = false;
 //			}
 //
@@ -302,22 +312,22 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 		if (file.exists()) {
 			File[] files = file.listFiles();
 			if (files.length == 0) {
-				System.out.println("ÎÄ¼ş¼ĞÊÇ¿ÕµÄ!");
+				System.out.println("æ–‡ä»¶å¤¹æ˜¯ç©ºçš„!");
 
 			} else {
 				for (File file2 : files) {
 					if (file2.isDirectory()) {
-						System.out.println("ÎÄ¼ş¼Ğ:" + file2.getAbsolutePath());
+						System.out.println("æ–‡ä»¶å¤¹:" + file2.getAbsolutePath());
 
 						// traverseFolder2(file2.getAbsolutePath());
 					} else {
-						System.out.println("ÎÄ¼ş:" + file2.getAbsolutePath());
+						System.out.println("æ–‡ä»¶:" + file2.getAbsolutePath());
 
 					}
 				}
 			}
 		} else {
-			System.out.println("ÎÄ¼ş²»´æÔÚ!");
+			System.out.println("æ–‡ä»¶ä¸å­˜åœ¨!");
 
 		}
 	}
