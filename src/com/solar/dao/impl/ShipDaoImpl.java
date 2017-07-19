@@ -1,6 +1,7 @@
 package com.solar.dao.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,15 +11,18 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solar.dao.ShipDao;
 import com.solar.utils.ReadFile;
+import com.solar.utils.ResouceBundleUtil;
 import com.sun.jna.Function;
 
 public class ShipDaoImpl implements ShipDao {
-	
+
 	private ResourceBundle resource = ResourceBundle.getBundle("config/ship");
-	private final String  VERSION = "version.txt";
+	private final String VERSION = "version.txt";
 
 	/**
 	 * @author 陈守貌
@@ -29,7 +33,7 @@ public class ShipDaoImpl implements ShipDao {
 	@Override
 	public Map<String, Object> updateVersion(String json) {
 		// TODO Auto-generated method stub
-		
+
 		return null;
 	}
 
@@ -40,14 +44,26 @@ public class ShipDaoImpl implements ShipDao {
 	 * @param key,一个字符串数据，即想要更新的组件的关键字
 	 */
 	@Override
-	public Map<String, Object> getShipVersion(String[] key) {
+	public Map<String, List> getShipVersion(String[] key) {
 		// TODO Auto-generated method stub
-		Map<String, Object> result = new HashMap<String,Object>();
-		for(String str:key){
-			String versionPath = resource.getString("web") + File.separator +resource.getString(str) + File.separator + VERSION; 
-			ReadFile readFile = new ReadFile();
-			Map<String, Object> map = readFile.readFileByLines(versionPath);
-			result.putAll(map);
+		Map<String, List> result = new HashMap<String, List>();
+		List resultList = new ArrayList();
+		try { 
+			ResouceBundleUtil resouceBundleUtil = new ResouceBundleUtil();
+			for (String str : key) {
+				String versionPath = resouceBundleUtil.getInfo("config/ship", str) + File.separator + VERSION;
+
+				List<String> content = FileUtils.readLines(new File(versionPath)); 
+				Map<String, String> map = new HashMap<String, String>();
+				if(content.size() > 0){
+					map.put(str, content.get(0));
+				}
+				resultList.add(map); 
+			}
+			result.put("ship", resultList);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -57,9 +73,9 @@ public class ShipDaoImpl implements ShipDao {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public static void main(String[] args) {
-		Map<String, Object> map = new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("db", 12312);
 		System.out.println(123);
 	}

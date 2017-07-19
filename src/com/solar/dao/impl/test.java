@@ -13,20 +13,28 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;  
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solar.utils.ResouceBundleUtil;  
   
   
 public class test {  
       
+	public static void main(String[] args) {
+		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
+		
+	String haitu = bundleUtil.getInfo(System.getProperty("user.dir") + "/WebContent/config/ship.properties", "haitu");
+		System.out.println(haitu);
+	}
+	
    
-    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {  
-    	//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web
-		//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web/hello.jsp
-    	
-    	String temp = "D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web";
-    	
-    	String source = "D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web/hello.jsp";
-    	
-    	System.out.println(source.indexOf("D") > 0);
-    }  
+//    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {  
+//    	//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web
+//		//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web/hello.jsp
+//    	
+//    	String temp = "D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web";
+//    	
+//    	String source = "D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/web/hello.jsp";
+//    	
+//    	System.out.println(source.indexOf("D") > 0);
+//    }  
 }  

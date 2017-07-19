@@ -5,9 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,13 +23,16 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysql.jdbc.PreparedStatement;
 import com.solar.bean.Version;
 import com.solar.dao.LandDao;
+import com.solar.utils.ConnectUtil;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileMd5;
 import com.solar.utils.FileSize;
 import com.solar.utils.MD5;
 import com.solar.utils.ReadFile;
+import com.solar.utils.ResouceBundleUtil;
 import com.solar.utils.VersionListUtil;
 import com.solar.utils.Zip;
 
@@ -35,6 +43,11 @@ public class LandDaoImpl implements LandDao {
 
 	private final String VERSION = "depend.txt";
 
+	private final String HAITU = "haitu";
+	private final String HAITU_VALUE = "海图版本";
+	private final String DITU = "ditu";
+	private final String DITU_VALUE = "底图版本";
+
 	private static ResourceBundle resource = ResourceBundle.getBundle("config/land");
 
 	@Override
@@ -44,8 +57,11 @@ public class LandDaoImpl implements LandDao {
 		// 解析各个版本，如你图，数据库，web 以及 想要更新的对应的版本
 
 		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-
+		
+		//先声明一个读取配置文件的工具
+		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
 		try {
 			Map<String, Map<String, String>> map;
 			map = mapper.readValue(versionInfo, HashMap.class);
@@ -68,28 +84,72 @@ public class LandDaoImpl implements LandDao {
 				}
 
 			}
+
 			int index = 0;
 			for (Map<String, String> shipVersionMap : shipVersionList) {
 
-					String key = keyList.get(index++);
-					// 获取此部分在船端的版本
-					String moduleVersionOfShip = shipVersionMap.get(key);
+				String key = keyList.get(index++);
+				// 获取此部分在船端的版本
+				String moduleVersionOfShip = shipVersionMap.get(key);
+
+				// 声明插入数据库更新日志的语句
+				String sql = "insert into update_logs values(?,?,?,?,?,?,?)";
+				ConnectUtil connectUtil = new ConnectUtil();
+				Connection conn = connectUtil.getConn();
+				try {
+					PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+					ps.setString(1, "localhost");
+					ps.setString(2, bundleUtil.getInfo("config/module", key));
+					ps.setString(3, moduleVersionOfShip);
+					SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					Date date = new Date();
+					ps.setString(5, simpleFormat.format(date));
+				
 					// 非空，则获取对应在岸端的版本
 					if (!moduleVersionOfShip.equals(null)) {
 						// 获取在船端的最新版本
 						String upToDateVersion = getVersionFromPath(resource.getString(key)).get(0).toString();
+
+						ps.setString(4, upToDateVersion);
+						
+						
+						
+						// 版本的分析 看看存不存在依赖
 						resultMap = versionFilter(key, keyList, moduleVersionOfShip, upToDateVersion);
 						// 生成增量升级包
-						if ((boolean) resultMap.get("result")) {
+						if ((boolean) resultMap.get("result") || (boolean) resultMap.get("needDb")) {
+							
+							boolean state = (boolean) resultMap.get("needDb");
 							resultMap.clear();
 							// 生成对应的增量包
 							resultMap.put("result", generateIncrement(key, moduleVersionOfShip, upToDateVersion));
-						} else {
-							return resultMap;
+							resultMap.put(moduleVersionOfShip, "打包成功");
+							list.add(resultMap);
+							
+							//到此步骤已经可以算是更新成功的了，将更新语句的状态设置为 1，1 代表成功的意思
+							ps.setInt(6, 1);
+							 
+							String description = "打包成功" + (state ? "系统同时打包了数据库到最新版本":"");
+							ps.setString(7, description); 
+						} else { 
+							
+							ps.setInt(6, 0);
+							ps.setString(7, (String) resultMap.get("info")); 
+							list.add(resultMap);
 						}
 
+					} else {
+						resultMap.put(moduleVersionOfShip, "是最新版本");
+						ps.setInt(6, 0);
+						ps.setString(7, "是最新版本"); 
+						list.add(resultMap);
 					}
-				 
+					ps.execute();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
 
 		} catch (JsonParseException e) {
@@ -175,7 +235,7 @@ public class LandDaoImpl implements LandDao {
 			// 比较两版本的文件，将增量结果储存在 compareFile 的集合中
 			List<FileMd5> compareFile = compareFile(newVersionMap, oldVersionMap);
 
-			// 复制增量到一个临时目录 
+			// 复制增量到一个临时目录
 			copyFile(key, compareFile, newVersionPath);
 			result = true;
 		} catch (IOException e) {
@@ -205,19 +265,26 @@ public class LandDaoImpl implements LandDao {
 				String filePath = fileMd5.getFile().getAbsolutePath();
 				filePath = filePath.replaceAll("\\\\", "/");
 				// String startTag = "D:\\海图项目\\zip2";
-				//D:\海图项目\reposities\应用\1.0.0.1_app_release_20170718\web
-				//D:\海图项目\reposities\应用\1.0.0.1_app_release_20170718\web\hello.jsp
+				// D:\海图项目\reposities\应用\1.0.0.1_app_release_20170718\web
+				// D:\海图项目\reposities\应用\1.0.0.1_app_release_20170718\web\hello.jsp
 				String destDir = "";
 				String sourceDir = fileMd5.getFile().getAbsolutePath();
 				String temp = startTag;
-				String notApp = "";
-				if(key.equals("app")){
-					temp = startTag + "web"; 
+				String notApp = ""; 
+				//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/config/3212.txt
+				//D:/海图项目/reposities/应用/1.0.0.1_app_release_20170718/
+				if (key.equals("app")) {
+					temp = startTag + "web";
 					sourceDir = sourceDir.replaceAll("\\\\", "/");
 					temp = temp.replaceAll("\\\\", "/");
-					if(sourceDir.indexOf(temp) < 0)
+					if (sourceDir.indexOf(temp) < 0)
 						temp = startTag;
-				}else{
+				    if(sourceDir.indexOf(startTag + "config") != -1){
+						temp = startTag + "config";
+						notApp = "config";
+					}//D:\海图项目\reposities\应用\1.0.0.0_app_release_20170713\config
+					//D:\海图项目\reposities\应用\1.0.0.0_app_release_20170713\web\WEB-INF\classes
+				} else {
 					notApp = key;
 				}
 				int index = filePath.indexOf(temp);
@@ -225,15 +292,16 @@ public class LandDaoImpl implements LandDao {
 					index = temp.length();
 					filePath = filePath.substring(index, filePath.length());
 					
-					if(notApp != "")
-						destDir = tempPath + File.separator + notApp +  File.separator + filePath  ;
+					if(notApp.equals("config")){
+						destDir = tempPath + "/WEB-INF/classes/config"  + filePath;
+					}
+					else if (notApp != "")
+						destDir = tempPath + File.separator + notApp + File.separator + filePath; 
 					else
-					    destDir = tempPath + File.separator + filePath;
-				}  
-				
-				
-				stateCopyResult = copyUtil.copyFile(sourceDir,
-						destDir, true);
+						destDir = tempPath + File.separator + filePath;
+				}
+
+				stateCopyResult = copyUtil.copyFile(sourceDir, destDir, true);
 				// 如果复制文件出现差错，则写倒日志中去
 				if (!stateCopyResult) {
 					// 写到文件中
@@ -409,16 +477,26 @@ public class LandDaoImpl implements LandDao {
 					break outer;
 				}
 				map.clear();
-				String responseInfo = "版本存在依赖，需要把" + returnKey + "更新";
+
+				map.put("needDb", returnKey.equals("db,") ? true : false);
+
+				String responseInfo = "版本存在依赖，需要把";
+
+				if (returnKey.contains(HAITU))
+					responseInfo += " " + HAITU_VALUE;
+				if (returnKey.contains(DITU))
+					responseInfo += " " + DITU_VALUE;
+				responseInfo += " 更新";
 				map.put("info", responseInfo);
 				map.put("result", false);
 				return map;
 			}
-
+			map.put("needDb",  false);
 			map.put("result", true);
 		} else {
 			// 版本一致，无需更新
 			String responseInfo = "版本一致，无需更新";
+			map.put("needDb",  false);
 			map.put("info", responseInfo);
 			map.put("result", false);
 		}

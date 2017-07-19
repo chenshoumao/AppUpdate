@@ -9,7 +9,7 @@ public class RunTest {
 	public static void main(String[] args) {
 		try {
 		//	String json = "{\"ship\": {\"db\":\"1.0.0.0_db_release_20170713\",\"haitu\":\"1.0.0.0_haitu_release_20170713\"}}";
-			String json = "{\"ship\": [{\"app\":\"1.0.0.0_app_release_20170713\"},{\"db\":\"1.0.0.0_db_release_20170713\"}]}";
+			String json = "{\"ship\": [{\"app\":\"1.0.0.0_app_release_20170713\"}]}";
 //			String json = "{\"ship\": [{\"db\":\"1.0.0.0_db_release_20170713\"}]}";
 			LandDaoImpl landDaoImpl = new LandDaoImpl();
 			Map<String, Object> map = landDaoImpl.analysisVersion(json);

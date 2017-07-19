@@ -1,9 +1,11 @@
 eclipse.preferences.version=1
+encoding//WebContent/NewFile.jsp=UTF-8
 encoding//WebContent/index.jsp=UTF-8
 encoding//src/com/solar/dao/impl/LandDaoImpl.java=UTF-8
 encoding//src/com/solar/dao/impl/ShipDaoImpl.java=UTF-8
 encoding//src/com/solar/servlet/LandListener.java=UTF-8
 encoding//src/com/solar/servlet/UnZipMonitor.java=UTF-8
 encoding//src/config/land.properties=UTF-8
+encoding//src/config/module.properties=UTF-8
 encoding//src/config/ship.properties=UTF-8
 encoding/<project>=UTF-8

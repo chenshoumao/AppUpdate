@@ -88,7 +88,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 							//更新
 							CopyFileUtil copyFileUtil = new CopyFileUtil();
 							ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
-							String webUrl = resourceBundle.getInfo("config/ship","web");  
+							String webUrl = resourceBundle.getInfo("config/ship","app");  
 							String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
 							copyFileUtil.copyDirectory(unzipPath, webUrl, true);
 							
@@ -199,113 +199,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 		return true;
 	}
 
-//	public static boolean unzip(String sourcePath, String outPath) {
-//		boolean stateResult = false;
-//		
-//		long zipFileSize = 0;
-//		try {
-//			
-//			
-//
-//			// 文件输入流
-//			FileInputStream fin = null;
-//
-//			
-//			boolean runState = false;
-//			while (!runState) {
-//				
-//				
-//				try { 
-//					fin = new FileInputStream(sourcePath);
-//				File fileJudge = new File(sourcePath);
-//				String name = "";
-//				name = fileJudge.getName(); 
-//				long zipSize = Long.valueOf(name.substring(0, name.indexOf("_")));
-//				zipFileSize = Long.valueOf(name.substring(name.indexOf("_") + 1, name.indexOf(".")));
-//				long itSize = fileJudge.length();
-//				System.out.println(itSize + ",,," + zipSize);
-//				if (itSize == zipSize)
-//					break;
-//
-//				System.out.println("................");
-//				 
-//				runState = true;
-//				} catch (Exception e) {
-//					// TODO: handle exception
-//					System.out.println(e);
-//					runState = false;
-//					Thread.sleep(4000);
-//				}
-//			}
-//			
-//			
-//			// 需要维护所读取数据校验和的输入流。校验和可用于验证输入数据的完整性
-//			CheckedInputStream checkIn = new CheckedInputStream(fin, new CRC32());
-//			// 指定编码 否则会出现中文文件解压错误
-//			Charset gbk = Charset.forName("GBK");
-//			// zip格式的输入流
-//			ZipInputStream zin = new ZipInputStream(checkIn, gbk);
-//
-//			// 遍历压缩文件中的所有压缩条目
-//			ZipEntry zinEntry;
-//
-//			while ((zinEntry = zin.getNextEntry()) != null) {
-//				System.out.println(zinEntry);
-//				File targetFile = new File(outPath + File.separator + zinEntry.getName());
-//
-//				System.out.println("..." + targetFile + "   " + targetFile.getParentFile());
-//
-//				sourceUpdatePath = targetFile.toString();
-//				if (!targetFile.getParentFile().exists()) {
-//					System.out.println("..." + targetFile + "   " + targetFile.getParentFile());
-//					targetFile.getParentFile().mkdirs();
-//				}
-//				if (zinEntry.isDirectory()) {
-//					targetFile.mkdirs();
-//				} else {
-//					FileOutputStream fout = new FileOutputStream(targetFile);
-//					byte[] buff = new byte[1024];
-//					int length;
-//					while ((length = zin.read(buff)) > 0) {
-//						fout.write(buff, 0, length);
-//					}
-//					fout.close();
-//				}
-//			}
-//
-//			zin.close();
-//			fin.close();
-//			System.out.println(checkIn.getChecksum().getValue());
-//			checkIn.close();
-//
-//			Thread.sleep(4000);
-//			File file = new File(sourcePath);
-//
-//			if (file.exists())
-//				file.delete();
-//			File afterUnZip5 = new File("D:\\海图项目\\zip5");
-//
-//			long afterUnZip5Size = fileSize.getFileSize(afterUnZip5);
-//			long preUnZip5Size = zipFileSize;
-//
-//			boolean resultState = preUnZip5Size == afterUnZip5Size;
-//			if (resultState){
-//				System.out.println("解压数据成功");
-//				stateResult = true;
-//			}
-//			else{
-//				System.out.println("解压数据损失");
-//				stateResult = false;
-//			}
-//
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			stateResult = false;
-//			System.out.println(e);
-//		}
-//		return stateResult;
-//		// System.exit(0);
-//	}
+ 
 
 	public static void updateFile(String resourcePath, String desPath) {
 		File file = new File(resourcePath);
