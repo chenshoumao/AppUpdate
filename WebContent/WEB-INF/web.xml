@@ -14,6 +14,16 @@
     <servlet-class>com.solar.servlet.UnZipMonitor</servlet-class>
     <load-on-startup>5</load-on-startup>
   </servlet>
+  <servlet>
+    <servlet-name>UpdateShipLogs</servlet-name>
+    <servlet-class>com.solar.servlet.UpdateShipLogs</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+   <servlet>
+    <servlet-name>ClearServlet</servlet-name>
+    <servlet-class>com.solar.servlet.ClearServlet</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
   <servlet-mapping>
     <servlet-name>upzip</servlet-name>
     <url-pattern>/upzip</url-pattern>

@@ -14,6 +14,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.SynchronousQueue;
 import java.util.zip.CRC32;
@@ -23,6 +24,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServlet;
 
+import com.solar.dao.impl.ShipDaoImpl;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileSize;
 import com.solar.utils.ReadFile;
@@ -42,9 +44,10 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 	public static void monitor() {
 
 		// 输出文件路径
-		String outPath = "D:/海图项目/zip5";
-		String filePath = ("D:/海图项目/通知文件/压缩文件");
-		String filePath2 = ("D:\\海图项目\\通知文件\\解压文件");
+	//	String outPath1 = "D:/海图项目/zip5";
+		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
+		String filePath = bundleUtil.getInfo("config/ship", "informZipPath");
+		String filePath2 = bundleUtil.getInfo("config/ship", "informUnzipPath");
 		try {
 
 			// 获取文件系统的WatchService对象
@@ -84,13 +87,20 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 						System.out.println(path.toString());
 						System.out.println(filePath2);
 						Thread.sleep(3000);
+						filePath2 = filePath2.replaceAll("/", "\\\\");
 						if((path.toString()).equals(filePath2)){
+							
+							//接下来即将复制文件到应用中，应该先判断增量文件的产生版本，看看起始的旧版本是否跟自身对应
+							ShipDaoImpl shipDao = new ShipDaoImpl();
+							Map<String, Object> versionValidateMap = shipDao.validateVersion();
+							
+							if((boolean) versionValidateMap.get("state")){ 
 							//更新
 							CopyFileUtil copyFileUtil = new CopyFileUtil();
 							ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
 							String webUrl = resourceBundle.getInfo("config/ship","app");  
 							String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
-							copyFileUtil.copyDirectory(unzipPath, webUrl, true);
+							copyFileUtil.copyDirectory(unzipPath, webUrl, true); 
 							
 							//判断增量文件中是否有sql文件
 							File fileScan = new File(unzipPath+File.separator + "db");
@@ -99,18 +109,17 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 								for(File sqlFile:sqlFileList){
 									//更新数据库
 									SQLExcute sqlExcute = new SQLExcute();
-									sqlExcute.updateDB(sqlFile);
-									
+									sqlExcute.updateDB(sqlFile); 
 								}
-							} 
-							
+							}  
 							//重启tomcat7
 							TomcatUtil tomcatUtil = new TomcatUtil();
 							tomcatUtil.stopTomcat();
+							}
 						}
 						//解压
 						else{
-							unzip(zipPath, outPath);
+							unzip(zipPath);
 						    WriteFileUtil writeFileUtil = new WriteFileUtil();
 						    ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
 						    String informUnzipFilePath = resourceBundle.getInfo("config/ship","informUnzipFilePath"); 
@@ -181,7 +190,7 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 	}
 	
 	
-	public static boolean unzip(String sourcePath, String outPath) throws UnsupportedEncodingException {
+	public static boolean unzip(String sourcePath) throws UnsupportedEncodingException {
 		ResourceBundle resource = ResourceBundle.getBundle("config/ship");
 		String zipPath = resource.getString("informZipFilePath");
 		zipPath = new String(zipPath.getBytes("ISO-8859-1"),"utf-8");

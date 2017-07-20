@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solar.dao.ShipDao;
+import com.solar.dao.impl.LandDaoImpl;
 import com.solar.dao.impl.ShipDaoImpl;
 
 /**
@@ -25,7 +26,7 @@ import com.solar.dao.impl.ShipDaoImpl;
 @WebServlet("/ShipServlet")
 public class ShipServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+    private ShipDaoImpl dao;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -47,14 +48,23 @@ public class ShipServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		 
+		PrintWriter out = response.getWriter();
 		String data = request.getParameter("data");
 		
-		//获取本地的对应组件的版本,存在map集合中
-		Map<String, List> localVersion = this.getLocalVersion(data);
-		ObjectMapper mapper = new ObjectMapper();
-		String json = mapper.writeValueAsString(localVersion);
-		request.getRequestDispatcher("/LandListener?ship="+json).forward(request,response);
+		//默认加上数据库的版本
+		data += "db";
+		dao = new ShipDaoImpl();
+	 
+		 
+			//获取本地的对应组件的版本,存在map集合中
+			Map<String, List> localVersion = this.getLocalVersion(data);
+		
+			ObjectMapper mapper = new ObjectMapper();
+			String json = mapper.writeValueAsString(localVersion); 
+			dao.writeUpdateLogs(data, json);
+			request.getRequestDispatcher("/LandListener?ship="+json).forward(request,response);
+	 
+		//
 		
 //		PrintWriter out = response.getWriter();
 //		out.println(localVersion);W
@@ -76,32 +86,7 @@ public class ShipServlet extends HttpServlet {
 //		}
 	}
 	
-//	public static void main(String[] args) {
-//		String name = "csm";
-//		String sex = "boy";
-//		String method1 = "sayHello";
-//		
-//		 Class osSystem = null;
-//		   try {
-//		      osSystem = Class.forName("com.solar.servlet.ShipServlet");
-//		      Object obj = osSystem.newInstance();
-//		      //获取方法  
-//		      Method m = obj.getClass().getDeclaredMethod(method1, String.class);
-//		      //调用方法  
-//		     m.invoke(obj, name);
-//		     
-//		     //获取方法  
-//		      Method m2 = obj.getClass().getDeclaredMethod(method1, String.class,String.class);
-//		     m2.invoke(obj, name,sex);
-//		     
-//
-//		   } catch (Exception e1) {
-//		      e1.printStackTrace();
-//		   }
-//
-//	
-//	 
-//	}
+
 	
 	public void sayHello(String name){
 		System.out.println(name);

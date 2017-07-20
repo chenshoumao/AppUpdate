@@ -9,4 +9,12 @@ public interface ShipDao {
 	public Map<String, List> getShipVersion(String[] key);
 	
 	public Map<String, Object> upzip();
+	
+	public boolean writeUpdateLogs(String data,String json);
+	
+	public boolean updateLogs(String data,String json);
+	
+	
+	
+	public Map<String, Object> validateLogs(String data);
 }

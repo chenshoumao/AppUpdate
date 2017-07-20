@@ -3,9 +3,13 @@ package com.solar.utils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+
+import com.mysql.jdbc.PreparedStatement;
 
 public class SQLExcute {
 
@@ -58,4 +62,25 @@ public class SQLExcute {
 			// TODO: handle exception
 		}
 	}
+	
+	public static String getVersionByKey(String key,String tableName){
+		String sql = "slect new_version from ? where key = ? order by update_time desc";
+		ConnectUtil connectUtil = new ConnectUtil();
+		Connection conn = connectUtil.getConn();
+		
+		try {
+			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+			ps.setString(1, tableName);
+			ps.setString(2, key);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next())
+				return rs.getString(1);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 }
