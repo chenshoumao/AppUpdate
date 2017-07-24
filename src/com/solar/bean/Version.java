@@ -57,6 +57,14 @@ public class Version implements Comparable{
 	public String getBase_Version() {
 		return base_Version;
 	}
+	public String getType_Version() {
+		return type_Version;
+	}
+
+	public void setType_Version(String type_Version) {
+		this.type_Version = type_Version;
+	}
+
 	@Override
 	public int compareTo(Object arg0) {
 		// TODO Auto-generated method stub
@@ -77,7 +85,7 @@ public class Version implements Comparable{
 	
 	public String toString(){
 		SimpleDateFormat dateFormet = new SimpleDateFormat("yyyyMMdd");
-		return this.getMain_Version() + "_" + this.type_Version + "_" + this.getBase_Version() + "_" + dateFormet.format(this.getDate_Version());
+		return  this.getMain_Version() + "_" + this.type_Version + "_" + this.getBase_Version() + "_" + dateFormet.format(this.getDate_Version());
 	}
 	
 	

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE> ZTREE DEMO - Standard Data </TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/demo.css" type="text/css">
+	<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
+	<!--  <script type="text/javascript" src="js/jquery.ztree.excheck-3.5.js"></script>
+	  <script type="text/javascript" src="js/jquery.ztree.exedit-3.5.js"></script>-->
+	<SCRIPT type="text/javascript">
+	 	
+		var zNodes = ''; 
+	
+		var setting = {	}; 
+    
+		$(document).ready(function(){ 
+			$.ajax({
+				url:'http://localhost:8080/AppUpdate/getLandVersionServlet',
+				type:'get',
+				dataType:'json',
+				async :false,
+				success:function(list){ 
+					zNodes += '[';
+					for(var i = 0; i < list.length;i++){
+						$.each(list[i],function(key,values){  
+						   // console.log(key);
+						    zNodes += '{name:"' + key + '",';
+						    zNodes += 'children:[';
+						  
+						    $(values).each(function(){  
+				 				var count = 0;
+				 				var version = '';
+						    	$.each(this,function(key,values){  
+								     console.log(key + "," + values);  
+								     if(++count==4){
+								    	 version += formatDate(values);
+								    	// alert(UnixToDate(values));
+								    	 zNodes += '{name:"'+version+'"},'
+								     }
+								     version += values +'_';
+								    
+								}); 
+						    });  
+						    zNodes += ']},';
+						}); 
+					}
+					zNodes += ']'; 
+					 
+				} 
+			});  
+			$.fn.zTree.init($("#treeDemo"), setting, eval(zNodes));
+		});
+		
+		
+		//时间转换 
+		function   formatDate(now)   {
+		    var   now= new Date(now);     
+		    var   year=now.getFullYear();     
+		    var   month=now.getMonth()+1;     
+		    var   date=now.getDate();     
+		//    var   hour=now.getHours();
+		//    var   minute=now.getMinutes();     
+		//    var   second=now.getSeconds();
+		    return   year+"年"+fixZero(month,2)+"月"+fixZero(date,2)+"日"; 
+		}  
+		//时间如果为单位数补0 
+		function fixZero(num,length){     
+		    var str=""+num;
+		    var len=str.length;     var s="";
+		    for(var i=length;i-->len;){         
+		        s+="0";
+		    }
+		    return s+str;
+		}
+		 
+	</SCRIPT>
+</HEAD>
+
+<BODY>
+ 
+<div class="content_wrap" >
+	<div class="zTreeDemoBackground left" >
+		<ul id="treeDemo" class="ztree" style="width: 500px;"></ul>
+	</div>
+	 
+</div>
+</BODY>
+</HTML>
