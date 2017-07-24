@@ -47,11 +47,11 @@ public class UpdateShipLogs extends HttpServlet {
 	 
 		
 		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
-		String data ="app,haitu,ditu";
+		String data ="app,haitu,ditu,db";
 		String[] dataList = data.split(","); 
 		ShipDaoImpl dao = new ShipDaoImpl();
-		Map<String, List> localVersion = dao.getShipVersion(dataList);
-		List<Map<String, Object>> list = localVersion.get("ship");
+		Map<String,Object> localVersionMap = dao.getShipVersion(dataList);
+	 
 		try {
 			
 			int count = 0;
@@ -63,11 +63,8 @@ public class UpdateShipLogs extends HttpServlet {
 				PreparedStatement ps; 
 				ps = (PreparedStatement) conn.prepareStatement(sql);
 				
-				String version = null;
-				for(Map<String, Object> map:list){
-					if(map.get(key) != null)
-						version = (String) map.get(key);
-				} 
+				String version = (String) localVersionMap.get(key);
+				 
 				ps.setString(1, version);
 				SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date date = new Date();

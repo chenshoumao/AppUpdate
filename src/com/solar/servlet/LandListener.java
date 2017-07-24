@@ -16,10 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solar.bean.Version;
 import com.solar.dao.LandDao;
 import com.solar.dao.impl.LandDaoImpl;
+import com.solar.test.MyException;
 import com.solar.utils.VersionListUtil;
 
 /**
@@ -30,7 +33,8 @@ public class LandListener extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private LandDaoImpl dao = new LandDaoImpl();
-       
+      
+	private static Logger logger = Logger.getLogger(LandDaoImpl.class);
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -44,14 +48,21 @@ public class LandListener extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-		//获取船的版本
-		String versionInfo = request.getParameter("ship");
-		
-		 Map<String, Object> map = dao.analysisVersion(versionInfo);
-		 PrintWriter out = response.getWriter();
-		 out.print(map);
-		
+		try {
+			logger.debug("岸端 第一步 ：");
+			logger.debug("	岸端开始 解析船端传来的数据");
+			//获取船的版本
+			String versionInfo = request.getParameter("ship");
+			if(versionInfo.equals("") && versionInfo.equals(null)){
+				throw new MyException("岸端 第一步 ：船端传来的数据为空！");
+			}
+			logger.debug("	船端传来的数据为：" + versionInfo);
+			Map<String, Object> map = dao.analysisVersion(versionInfo);
+			//PrintWriter out = response.getWriter();
+			//out.print(map);
+		} catch (Exception e) {
+			// TODO: handle exception
+		} 
 	} 
 	
 	/**
@@ -61,5 +72,4 @@ public class LandListener extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

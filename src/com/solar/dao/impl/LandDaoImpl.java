@@ -20,6 +20,11 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.swing.DebugGraphics;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.pattern.LogEvent;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysql.jdbc.PreparedStatement;
 import com.solar.bean.Version;
 import com.solar.dao.LandDao;
+import com.solar.test.MyException;
 import com.solar.utils.ConnectUtil;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileMd5;
@@ -41,6 +47,8 @@ import com.solar.utils.Zip;
 
 public class LandDaoImpl implements LandDao {
 
+	private static Logger logger = Logger.getLogger(LandDaoImpl.class);
+	
 	// 版本命名规范，如10.0.0_db_release_20170713，可是可分为四个部分
 	private static int length = 4;
 
@@ -57,6 +65,7 @@ public class LandDaoImpl implements LandDao {
 	public Map<String, Object> analysisVersion(String versionInfo) {
 		// TODO Auto-generated method stub
 
+		logger.debug("岸端 第二步 ：");
 		// 解析各个版本，如你图，数据库，web 以及 想要更新的对应的版本
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -66,37 +75,28 @@ public class LandDaoImpl implements LandDao {
 		// 先声明一个读取配置文件的工具
 		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
 		try {
-			Map<String, Map<String, String>> map;
+			logger.debug("	将数据解析成Map集合");
+			Map<String,Object> map;
 			map = mapper.readValue(versionInfo, HashMap.class);
 
-			// 用List 集合封装 船端的版本信息
-			// Map<String, String> shipVersionMap = new HashMap<String,
-			// String>();
-
-			List<Map<String, String>> shipVersionList = (List<Map<String, String>>) map.get("ship");
-
+			
 			// 先把要更新的组件的关键字存进 list 集合
 			List<String> keyList = new ArrayList<String>();
-
-			for (Map<String, String> moduleMap : shipVersionList) {
-				Iterator it = moduleMap.keySet().iterator();
-
-				while (it.hasNext()) {
-					String key = (String) it.next();
-					keyList.add(key);
-				}
-
-			}
+			logger.debug("	将Map的Key值存在String[] 中");
+			String[] keyStr = ((String) map.get("toUpdate")).split(",");
+			for(String str:keyStr)
+				keyList.add(str);
 
 			int index = 0;
 			boolean needDb = false;
-			for (Map<String, String> shipVersionMap : shipVersionList) {
-				for (String key : keyList) {
+			for (String key: keyList) {
+				    logger.debug("	岸端对"+key+ "进行版本的分析");
 					if (key.equals("db") && !needDb)
 						continue;
+					logger.debug("	" + key + "在船端的版本是：");
 					// 获取此部分在船端的版本
-					String moduleVersionOfShip = shipVersionMap.get(key);
-
+					String moduleVersionOfShip = (String) map.get(key);
+					logger.debug("	" + moduleVersionOfShip); 
 					// 声明插入数据库更新日志的语句
 					String sql = "insert into update_logs values(?,?,?,?,?,?,?)";
 					ConnectUtil connectUtil = new ConnectUtil();
@@ -109,25 +109,24 @@ public class LandDaoImpl implements LandDao {
 						SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						Date date = new Date();
 						ps.setString(5, simpleFormat.format(date));
-
+						
 						// 非空，则获取对应在岸端的版本
-						if (!moduleVersionOfShip.equals(null)) {
-							
-							//查一查在数据库的船端版本
-							String updateDateShipVersion =  SQLExcute.getVersionByKey(key, "ship_version");
-							
+						if (!moduleVersionOfShip.equals(null)) { 
+							logger.debug("	获取岸端中，"+ key + "中的最新版本");
 							// 获取在船端的最新版本
-							String upToDateVersion = SQLExcute.getVersionByKey(key, "land_version");
-
+							String upToDateVersion = getVersionFromPath(resource.getString(key)).get(0).toString();
 							ps.setString(4, upToDateVersion);
-
+							logger.debug("	"+ upToDateVersion); 
+							logger.debug("	版本的分析 看看存不存在依赖"); 
 							// 版本的分析 看看存不存在依赖
-							resultMap = versionFilter(key, keyList, moduleVersionOfShip, upToDateVersion);
+							resultMap = versionFilter(key, keyList,map, moduleVersionOfShip, upToDateVersion);
+							logger.debug("	分析结束");
 							// 生成增量升级包
 							if ((boolean) resultMap.get("result") || (boolean) resultMap.get("needDb")) {
-
+								logger.debug("岸端第三步");
 								needDb = (boolean) resultMap.get("needDb");
 								resultMap.clear();
+								logger.debug(" 生成对应的增量包");
 								// 生成对应的增量包
 								resultMap.put("result", generateIncrement(key, moduleVersionOfShip, upToDateVersion));
 								resultMap.put(moduleVersionOfShip, "打包成功");
@@ -146,10 +145,11 @@ public class LandDaoImpl implements LandDao {
 							}
 
 						} else {
-							resultMap.put(moduleVersionOfShip, "是最新版本");
+							
 							ps.setInt(6, 0);
-							ps.setString(7, "是最新版本");
+							ps.setString(7, "在船端的版本是空的");
 							list.add(resultMap);
+							throw new MyException("" + key + "在船端的版本是空的！"); 
 						}
 						ps.execute();
 						ps.close();
@@ -158,18 +158,11 @@ public class LandDaoImpl implements LandDao {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
 			}
 
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MyException("数据解析错误 ：" + e);
 		}
 		return null;
 	}
@@ -185,6 +178,7 @@ public class LandDaoImpl implements LandDao {
 	public List<Version> getVersionFromPath(String path) {
 		// TODO Auto-generated method stub
 		List<Version> list = new ArrayList<Version>();
+		logger.debug("	列出在岸端的所有版本"); 
 		try {
 			path = new String(path.getBytes("ISO-8859-1"), "utf-8");
 
@@ -199,15 +193,17 @@ public class LandDaoImpl implements LandDao {
 						list.add(new Version(name));
 					else {
 						System.out.println("命名非法！:  " + name);
+						logger.debug("	命名非法！:  " + name); 
 						// 通知相关人员，版本库命名不规范
 					}
 				}
 			}
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MyException(e.toString());
 		}
 		Collections.sort(list);
+		logger.debug("	" + list); 
 		return list;
 	}
 
@@ -224,6 +220,7 @@ public class LandDaoImpl implements LandDao {
 	 */
 	public boolean generateIncrement(String key, String moduleVersionOfShip, String moduleVersionOfLand) {
 		// TODO Auto-generated method stub
+		logger.debug("	开始生成增量包"); 
 		boolean result = false;
 		// 旧版本（即船端的版本）
 		String oldVersionPath = resource.getString(key) + "/" + moduleVersionOfShip + "/";
@@ -233,17 +230,18 @@ public class LandDaoImpl implements LandDao {
 		try {
 			oldVersionPath = new String(oldVersionPath.getBytes("ISO-8859-1"), "utf-8");
 			newVersionPath = new String(newVersionPath.getBytes("ISO-8859-1"), "utf-8");
-
+			logger.debug("	两版本的位置：" + oldVersionPath + "," + newVersionPath); 
 			Map<String, FileMd5> oldVersionMap;
-
+			logger.debug("	用md5 标示旧版本的文件");
 			// 用md5 标示旧版本的文件
 			oldVersionMap = listDir(oldVersionPath);
+			logger.debug("	用md5 标示新版本的文件");
 			// 用md5 标示新版本的文件
 			Map<String, FileMd5> newVersionMap = listDir(newVersionPath);
-
+			logger.debug("	比较两版本的文件，将增量结果储存在 compareFile 的集合中");
 			// 比较两版本的文件，将增量结果储存在 compareFile 的集合中
 			List<FileMd5> compareFile = compareFile(newVersionMap, oldVersionMap);
-
+			logger.debug("	复制增量到一个临时目录");
 			// 复制增量到一个临时目录
 			copyFile(key, moduleVersionOfShip, moduleVersionOfLand, compareFile, newVersionPath);
 			result = true;
@@ -265,15 +263,16 @@ public class LandDaoImpl implements LandDao {
 	public static void copyFile(String key, String moduleVersionOfShip, String moduleVersionOfLand,
 			List<FileMd5> fileMd5s, String startTag) {
 		CopyFileUtil copyUtil = new CopyFileUtil();
-
+		logger.debug("	获取指定的临时目录"); 
 		// 获取指定的临时目录
 		String tempPath = resource.getString("tempPath");
+		
 		try {
 			tempPath = new String(tempPath.getBytes("ISO-8859-1"), "utf-8");
-
+			logger.debug("		tempPath"); 
 			boolean stateCopyResult = false;
 			for (FileMd5 fileMd5 : fileMd5s) {
-				System.out.println(fileMd5.getFile().getAbsolutePath() + " " + fileMd5.getMd5());
+			
 
 				String filePath = fileMd5.getFile().getAbsolutePath();
 				filePath = filePath.replaceAll("\\\\", "/");
@@ -312,16 +311,20 @@ public class LandDaoImpl implements LandDao {
 					else
 						destDir = tempPath + File.separator + filePath;
 				}
-
+				logger.debug("	复制增量文件的信息"); 
+				logger.debug("		源文件"+ sourceDir); 
+				logger.debug("		目标地址"+ destDir); 
 				stateCopyResult = copyUtil.copyFile(sourceDir, destDir, true);
 				// 如果复制文件出现差错，则写倒日志中去
 				if (!stateCopyResult) {
 					// 写到文件中
+					throw new MyException("		文件复制失败");
 				}
 			}
-
+			logger.debug("	创建一个文件 用来标明增量文件是存在于哪两个版本之间"); 
 			// 创建一个文件 用来标明增量文件是存在于哪两个版本之间
 			String divisionFilePath = tempPath + "/" + (key.equals("app") ? "division.txt" : key + "/division.txt");
+			logger.debug("		文件是"+ divisionFilePath); 
 			File file = new File(divisionFilePath);
 			WriteFileUtil writeFileUtil = new WriteFileUtil();
 			List list = new ArrayList();
@@ -334,27 +337,26 @@ public class LandDaoImpl implements LandDao {
 			try {
 				json = mapper.writeValueAsString(list);
 				writeFileUtil.writeInfoToFile(json, divisionFilePath);
+				logger.debug("	文件内容是"+ json); 
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new MyException(e.toString());
 			}
 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		logger.debug("岸端第四步");
+		logger.debug("	打包文件，形成一个增量压缩包");
 		// 打包文件，形成一个增量包
 		Zip zip = new Zip();
-		String sourcePath = resource.getString("tempPath");
-		String outPutZipPath = resource.getString("zipPath");
-		// 转码
-		try {
-			sourcePath = new String(sourcePath.getBytes("ISO-8859-1"), "utf-8");
-			outPutZipPath = new String(outPutZipPath.getBytes("ISO-8859-1"), "utf-8");
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
+		String sourcePath = bundleUtil.getInfo("config/land","tempPath");
+		String outPutZipPath = bundleUtil.getInfo("config/land","zipPath");
+		logger.debug("	源文件路径：" + sourcePath);
+		logger.debug("	增量包路径： " + outPutZipPath);
 		zip.zip(sourcePath, outPutZipPath);
 
 	}
@@ -455,24 +457,17 @@ public class LandDaoImpl implements LandDao {
 		}
 		return list;
 	}
-
-	/**
-	 * @author 陈守貌
-	 * @time 2017-07-13
-	 * @function 判断版本间的差异，是否有增量，或者是否存在版本的依赖
-	 * @param key
-	 *            对应的更新部分名称
-	 * @param moduleVersionOfShip
-	 *            船端的版本
+	/*            船端的版本
 	 * @param moduleVersionOfLand
 	 *            岸端的版本
 	 */
-	public Map<String, Object> versionFilter(String key, List<String> keyList, String shipVersion,
+	public Map<String, Object> versionFilter(String key, List<String> keyList, Map<String, Object> allVersion,String shipVersion,
 			String moduleVersionOfLand) {
 		// TODO Auto-generated method stub
-
+		logger.debug("	版本的分析开始。。。"); 
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (!moduleVersionOfLand.equals(shipVersion)) {
+			logger.debug("	检查是否存在依赖。。。"); 
 			// 检查是否存在依赖
 			String path = resource.getString(key) + File.separator + moduleVersionOfLand + File.separator + VERSION;
 			try {
@@ -500,11 +495,11 @@ public class LandDaoImpl implements LandDao {
 						validateState = true;
 						continue;
 					}
-					if (dependValue.contains(shipVersion)) {
+					if (keyList.contains(dependKey)) {
 						validateState = true;
 						continue;
-					}
-					if (keyList.contains(dependKey)) {
+					} 
+					if (dependValue.contains((String)allVersion.get(dependKey))) {
 						validateState = true;
 						continue;
 					}
@@ -521,16 +516,10 @@ public class LandDaoImpl implements LandDao {
 				}
 				if (validateState) {
 					break outer;
-				}
-				
-				
-				
-				map.clear();
-
-				map.put("needDb", false);
-
-				String responseInfo = "版本存在依赖，需要把";
-
+				} 
+				map.clear(); 
+				map.put("needDb", false);  
+				String responseInfo = "版本存在依赖，需要把"; 
 				if (returnKey.contains(HAITU))
 					responseInfo += " " + HAITU_VALUE;
 				if (returnKey.contains(DITU))
@@ -543,13 +532,14 @@ public class LandDaoImpl implements LandDao {
 			map.put("needDb", validateState);
 			map.put("result", true);
 		} else {
+			logger.debug("	版本一致，无需更新"); 
 			// 版本一致，无需更新
 			String responseInfo = "版本一致，无需更新";
 			map.put("needDb", false);
 			map.put("info", responseInfo);
 			map.put("result", false);
 		}
-
+		logger.debug("	检查结果：" + map); 
 		return map;
 	}
 
@@ -588,5 +578,7 @@ public class LandDaoImpl implements LandDao {
 		}
 		System.out.println(result);
 	}
+
+	 
 
 }

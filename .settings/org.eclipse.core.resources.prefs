@@ -8,4 +8,5 @@ encoding//src/com/solar/servlet/UnZipMonitor.java=UTF-8
 encoding//src/config/land.properties=UTF-8
 encoding//src/config/module.properties=UTF-8
 encoding//src/config/ship.properties=UTF-8
+encoding//src/log4j.properties=UTF-8
 encoding/<project>=UTF-8

@@ -8,11 +8,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import com.mysql.jdbc.PreparedStatement;
 
 public class SQLExcute {
 
+	private static Logger logger = Logger.getLogger(SQLExcute.class);
 	public static void main(String[] args) {
 		updateDB();
 	}
@@ -49,6 +51,7 @@ public class SQLExcute {
 
 			if (sqlFile.getName().indexOf("sql") > 0) {
 				List<String> list = FileUtils.readLines(sqlFile);
+				logger.debug("数据库文件内容是：" + list);
 				ConnectUtil connectUtil = new ConnectUtil();
 				Connection conn = connectUtil.getConn();
 				for (String str : list) {

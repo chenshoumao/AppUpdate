@@ -14,107 +14,101 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solar.dao.ShipDao;
 import com.solar.dao.impl.LandDaoImpl;
 import com.solar.dao.impl.ShipDaoImpl;
+import com.solar.test.MyException;
 
 /**
  * Servlet implementation class ShipServlet
  */
 @WebServlet("/ShipServlet")
 public class ShipServlet extends HttpServlet {
+	private static Logger logger = Logger.getLogger(ShipServlet.class);
 	private static final long serialVersionUID = 1L;
-    private ShipDaoImpl dao;
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ShipServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	private ShipDaoImpl dao;
 
-    public static void main(String[] args) throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> map = new HashMap<String,Object>();
-		map.put("ster", 122);
-		String str = mapper.writeValueAsString(map);
-		System.out.println(str);
-    	
-	}
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter();
-		String data = request.getParameter("data");
-		
-		//默认加上数据库的版本
-		data += "db";
-		dao = new ShipDaoImpl();
-	 
-		 
-			//获取本地的对应组件的版本,存在map集合中
-			Map<String, List> localVersion = this.getLocalVersion(data);
-		
-			ObjectMapper mapper = new ObjectMapper();
-			String json = mapper.writeValueAsString(localVersion); 
-			dao.writeUpdateLogs(data, json);
-			request.getRequestDispatcher("/LandListener?ship="+json).forward(request,response);
-	 
-		//
-		
-//		PrintWriter out = response.getWriter();
-//		out.println(localVersion);W
-		
-		
-//		String action = request.getParameter("action");
-//		String part = request.getParameter("part");
-//		Class osSystem = null;
-//		try {
-//			osSystem = Class.forName("com.solar.servlet.ShipServlet");
-//			Object obj = osSystem.newInstance();
-//			// 获取方法
-//			Method m = obj.getClass().getDeclaredMethod(action, String.class);
-//			// 调用方法
-//			m.invoke(obj, part);
-//
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//		}
+	public ShipServlet() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
-	
 
-	
-	public void sayHello(String name){
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		try {
+			logger.debug("船端第一步：");
+			PrintWriter out = response.getWriter();
+			String data = request.getParameter("data");
+			if(data.equals("") || data.equals(null)){
+				throw new MyException("	船端请求更新的关键数据为空！");
+			}
+			data += "db";
+			logger.debug("	获取了 请求更新，请求的数据是 : " + data);
+			// 第一步 罗列出所有的组件版本
+			String shipKey = "app,haitu,ditu,db";
+			Map<String, Object> allShipVersion = this.getLocalVersion(shipKey);
+			System.out.println(12300);
+			// 第二步 在集合中，将请求的组件包含在内
+			allShipVersion.put("toUpdate", data);
+
+			ObjectMapper mapper = new ObjectMapper();
+			String json = mapper.writeValueAsString(allShipVersion);
+
+			logger.debug("	解析成完整的json格式数据: " + json);
+
+			// 讲请求的详细请求信息存进数据库
+			dao = new ShipDaoImpl();
+			dao.writeUpdateLogs(data, json);
+			logger.debug("	将信息发送到岸端"); 
+			request.getRequestDispatcher("/LandListener?ship=" + json).forward(request, response);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	}
+
+	public void sayHello(String name) {
 		System.out.println(name);
 	}
-	public void sayHello(String name,String sex){
+
+	public void sayHello(String name, String sex) {
 		System.out.println(name + "," + sex);
 	}
-	
+
 	/**
 	 * @author 陈守貌
 	 * @Time 2017-07-14
 	 * @Funtion 船端更新版本
 	 * 
 	 */
-	public Map<String, List> getLocalVersion(String part){
-		Map<String, List> map = new HashMap<String,List>();
-		//获取想要更新的组件的信息 
-		String[] updatePart = part.split(","); 
-		//获取本地对应的组件的版本信息
-		ShipDao dao =  new ShipDaoImpl();
-		map = dao.getShipVersion(updatePart); 
+	public Map<String, Object> getLocalVersion(String part) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 获取想要更新的组件的信息
+		String[] updatePart = part.split(",");
+		// 获取本地对应的组件的版本信息
+		ShipDao dao = new ShipDaoImpl();
+		map = dao.getShipVersion(updatePart);
 		return map;
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}

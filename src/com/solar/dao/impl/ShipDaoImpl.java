@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysql.jdbc.PreparedStatement;
 import com.solar.dao.ShipDao;
+import com.solar.test.MyException;
 import com.solar.utils.ConnectUtil;
 import com.solar.utils.ReadFile;
 import com.solar.utils.ResouceBundleUtil;
@@ -51,27 +52,28 @@ public class ShipDaoImpl implements ShipDao {
 	 * @param key,一个字符串数据，即想要更新的组件的关键字
 	 */
 	@Override
-	public Map<String, List> getShipVersion(String[] key) {
+	public Map<String, Object> getShipVersion(String[] key) {
 		// TODO Auto-generated method stub
-		Map<String, List> result = new HashMap<String, List>();
-		List resultList = new ArrayList();
+		Map<String, Object> result = new HashMap<String, Object>();
+		 
 		try {
-			ResouceBundleUtil resouceBundleUtil = new ResouceBundleUtil();
-			Map<String, String> map = new HashMap<String, String>();
+			ResouceBundleUtil resouceBundleUtil = new ResouceBundleUtil(); 
 			for (String str : key) {
 				String versionPath = resouceBundleUtil.getInfo("config/ship", str) + File.separator + VERSION;
 				File file = new File(versionPath);
 				if(file.exists()){
 					List<String> content = FileUtils.readLines(file);
-					
-					if (content.size() > 0) {
-						map.put(str, content.get(0)); 
+					if (content.size() == 1) {
+						result.put(str, content.get(0)); 
+					}
+					else if (content.size() > 0) {
+						throw new MyException(versionPath + "，内容中版本信息过多，存在多行数据") ;
 					}
 					
+				}else{
+					throw new MyException(versionPath + "不存在") ;
 				}
-			}
-			resultList.add(map);
-			result.put("ship", resultList);
+			} 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,18 +96,15 @@ public class ShipDaoImpl implements ShipDao {
 		ResouceBundleUtil bundleUtil = new ResouceBundleUtil();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			Map<String, List<Map<String, Object>>> map = mapper.readValue(json, HashMap.class);
-			List<Map<String, Object>> list = map.get("ship");
+			Map<String, Object> map = mapper.readValue(json, HashMap.class);
+		
 			int count = 0;
 			for (String key : keyList) {
 				String keyInfo = bundleUtil.getInfo("config/module", key);
 				
 				
-				String version = null;
-				for(Map<String, Object> listMap:list){
-					if(listMap.get(key) != null)
-						version = (String) listMap.get(key);
-				}
+				String version = (String) map.get(key);
+			
 				boolean state = selectLogs(keyInfo, version);
 				if(state){
 				String sql = "insert into ship_update_logs(update_type,original_version,create_time,update_state,is_over)"
@@ -241,10 +240,7 @@ public class ShipDaoImpl implements ShipDao {
 		
 		//获取本地的一系列的版本信息
 		String[] data = {"app","haitu","ditu","db"};
-		Map<String, List> shipVersionMap = this.getShipVersion(data);
-		List<Map<String, Object>> shipVersionList = shipVersionMap.get("ship");
-		
-		Map<String, Object> shipVersion = shipVersionList.get(0);
+		Map<String, Object> shipVersion = this.getShipVersion(data);  
 		
 		//审查结果
 		boolean state = false;
@@ -256,21 +252,25 @@ public class ShipDaoImpl implements ShipDao {
 			outer:
 			while(rs.next()){
 				String update_type = rs.getString(1);
-				String type = bundleUtil.getInfo("config/module", update_type);
+				String type = "";
 				String original_version = rs.getString(2);
 				File file = null;
-				switch (type) {
-				case "app":
+				switch (update_type) {
+				case "应用":
 					file = new File(tempPath + "/division.txt") ; 
+					type = "app";
 					break;
-				case "haitu":
+				case "海图":
 					file = new File(tempPath + "/haitu/division.txt") ; 
+					type = "haitu";
 					break;
-				case "ditu":
+				case "底图":
 					file = new File(tempPath + "/ditu/division.txt") ; 
+					type = "ditu";
 					break;
-				case "db":
+				case "数据库":
 					file = new File(tempPath + "/db/division.txt") ; 
+					type = "db";
 					break;
 				default:
 					break;

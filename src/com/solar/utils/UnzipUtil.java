@@ -2,7 +2,6 @@ package com.solar.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,9 +13,11 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.log4j.Logger;
+
 
 public class UnzipUtil {
-
+	private static Logger logger = Logger.getLogger(UnzipUtil.class);
 	/**
 	 * @author 陈守貌
 	 * @Time 2017-07-14
@@ -27,6 +28,9 @@ public class UnzipUtil {
 	 *            解压的后文件的存放路径
 	 */
 	public static boolean unzip(String sourcePath, String outPath) {
+		logger.debug("进入解压缩的工具类...");
+		logger.debug("源文件 ： " + sourcePath);
+		logger.debug("解压路径 ： " + outPath);
 		boolean stateResult = false;
 
 		long zipFileSize = 0;
@@ -40,23 +44,19 @@ public class UnzipUtil {
 					fin = new FileInputStream(sourcePath);
 					File fileJudge = new File(sourcePath);
 					String name = "";
-					name = fileJudge.getName();
-					//long zipSize = Long.valueOf(name.substring(0, name.indexOf("_")));
-					//zipFileSize = Long.valueOf(name.substring(name.indexOf("_") + 1, name.indexOf(".")));
-				//	long itSize = fileJudge.length();
-				//	if (itSize == zipSize)
-				//		break;
+					name = fileJudge.getName(); 
 					stateResult = true;
-				} catch (Exception e) {
-					// TODO: handle exception
+				} catch (Exception e) { 
 					System.out.println(e);
 					stateResult = false;
 					runCount++;
+					logger.debug("文件暂时不可解压,4秒后再尝试解压，目前已经失败"+runCount+"次");
 					Thread.sleep(4000);
 				}
 			}
 
 			if (stateResult) {
+				logger.debug("开始解压。。。");
 				// 需要维护所读取数据校验和的输入流。校验和可用于验证输入数据的完整性
 				CheckedInputStream checkIn = new CheckedInputStream(fin, new CRC32());
 				// 指定编码 否则会出现中文文件解压错误
@@ -97,17 +97,7 @@ public class UnzipUtil {
 				checkIn.close();
 
 				Thread.sleep(4000);
-				File file = new File(sourcePath);
-
-				// 删除掉压缩包
-				// if (file.exists())
-				// file.delete();
-				// File afterUnZip5 = new File("D:\\海图项目\\zip5");
-
-				// long afterUnZip5Size = fileSize.getFileSize(afterUnZip5);
-				// long preUnZip5Size = zipFileSize;
-
-				// boolean resultState = preUnZip5Size == afterUnZip5Size;
+				File file = new File(sourcePath); 
 			}
 
 		} catch (Exception e) {
@@ -116,14 +106,15 @@ public class UnzipUtil {
 			System.out.println(e);
 		}
 		if (stateResult) {
+			logger.debug("解压数据成功");
 			System.out.println("解压数据成功");
 			stateResult = true;
 		} else {
+			logger.debug("解压数据失败");
 			System.out.println("解压数据失败");
 			stateResult = false;
 		}
-		return stateResult;
-		// System.exit(0);
+		return stateResult; 
 	}
 
 	public Map<String, Object> updateDir() {

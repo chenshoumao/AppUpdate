@@ -1,0 +1,6 @@
+2017-07-21 11:25:10 [ main:0 ] - [ DEBUG ] This is debug message.
+2017-07-21 11:25:10 [ main:3 ] - [ ERROR ] This is error message.
+2017-07-21 11:38:24 [ main:0 ] - [ DEBUG ] java.lang.ArithmeticException: / by zero
+2017-07-21 11:47:19 [ main:0 ] - [ ERROR ] 12312312
+2017-07-21 13:38:03 [ main:0 ] - [ ERROR ] message is 12312312
+2017-07-21 14:06:56 [ main:0 ] - [ ERROR ] message is 12312ff312

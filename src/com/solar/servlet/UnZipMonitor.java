@@ -24,6 +24,9 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServlet;
 
+import org.apache.log4j.Logger;
+
+import com.solar.dao.impl.LandDaoImpl;
 import com.solar.dao.impl.ShipDaoImpl;
 import com.solar.utils.CopyFileUtil;
 import com.solar.utils.FileSize;
@@ -36,6 +39,8 @@ import com.solar.utils.WriteFileUtil;
 
 public class UnZipMonitor extends HttpServlet implements Runnable {
 
+	private static Logger logger = Logger.getLogger(UnZipMonitor.class);
+	
 	private static String updatePath = "D:/海图项目/zip4";
 	private static String sourceUpdatePath = "";
 
@@ -89,44 +94,56 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 						Thread.sleep(3000);
 						filePath2 = filePath2.replaceAll("/", "\\\\");
 						if((path.toString()).equals(filePath2)){
-							
+							logger.debug("船端第三步");
+							logger.debug("	接下来即将复制文件到应用中，应该先判断增量文件的产生版本，看看起始的旧版本是否跟自身对应");
 							//接下来即将复制文件到应用中，应该先判断增量文件的产生版本，看看起始的旧版本是否跟自身对应
 							ShipDaoImpl shipDao = new ShipDaoImpl();
+							logger.debug("	船端对于版本增量包，先进行验证。。。");
 							Map<String, Object> versionValidateMap = shipDao.validateVersion();
-							
+							logger.debug("	验证结果是 ： " + versionValidateMap.get("state"));
 							if((boolean) versionValidateMap.get("state")){ 
-							//更新
-							CopyFileUtil copyFileUtil = new CopyFileUtil();
-							ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
-							String webUrl = resourceBundle.getInfo("config/ship","app");  
-							String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
-							copyFileUtil.copyDirectory(unzipPath, webUrl, true); 
+								//更新
+								CopyFileUtil copyFileUtil = new CopyFileUtil();
+								ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
+								String webUrl = resourceBundle.getInfo("config/ship","app");  
+								String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
+								copyFileUtil.copyDirectory(unzipPath, webUrl, true); 
 							
-							//判断增量文件中是否有sql文件
-							File fileScan = new File(unzipPath+File.separator + "db");
-							if(fileScan.exists()){
-								File[] sqlFileList = fileScan.listFiles();
-								for(File sqlFile:sqlFileList){
-									//更新数据库
-									SQLExcute sqlExcute = new SQLExcute();
-									sqlExcute.updateDB(sqlFile); 
-								}
-							}  
-							//重启tomcat7
-							TomcatUtil tomcatUtil = new TomcatUtil();
-							tomcatUtil.stopTomcat();
+								//判断增量文件中是否有sql文件
+								File fileScan = new File(unzipPath+File.separator + "db");
+								if(fileScan.exists()){
+									File[] sqlFileList = fileScan.listFiles();
+									for(File sqlFile:sqlFileList){
+										//更新数据库
+										logger.debug("	更新数据库。。。");
+										SQLExcute sqlExcute = new SQLExcute();
+										sqlExcute.updateDB(sqlFile); 
+									}
+								}  
+								logger.debug("船端第四步");
+								logger.debug("	重启tomcat7");
+								//重启tomcat7
+								TomcatUtil tomcatUtil = new TomcatUtil();
+								tomcatUtil.stopTomcat();
 							}
-						}
+						}	
 						//解压
 						else{
-							unzip(zipPath);
-						    WriteFileUtil writeFileUtil = new WriteFileUtil();
-						    ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
-						    String informUnzipFilePath = resourceBundle.getInfo("config/ship","informUnzipFilePath"); 
-						    String unzipPath = resourceBundle.getInfo("config/ship","unzipPath"); 
-						    writeFileUtil.writeInfoToFile(unzipPath, informUnzipFilePath);
+							logger.debug("船端第二步");
+							logger.debug("	解压文件");
+							boolean state = unzip(zipPath);
+							logger.debug("	解压状态：" + state);
+							if(state){
+								logger.debug("	将解压后的信息书写到指定文件");
+								WriteFileUtil writeFileUtil = new WriteFileUtil();
+						    	ResouceBundleUtil resourceBundle = new ResouceBundleUtil(); 
+						    	String informUnzipFilePath = resourceBundle.getInfo("config/ship","informUnzipFilePath"); 
+						    	String unzipPath = resourceBundle.getInfo("config/ship","unzipPath");
+						    	logger.debug("	通知文件是： " + informUnzipFilePath);
+						    	logger.debug("	通知内容为 ： " + unzipPath);
+						    	writeFileUtil.writeInfoToFile(unzipPath, informUnzipFilePath);
+							}
 						}
-						// updateFile("","");
 					}
 					 System.out.println(event.kind() +"," + ((
 					 event.kind().toString()).equals("ENTRY_CREATE")));
@@ -191,15 +208,15 @@ public class UnZipMonitor extends HttpServlet implements Runnable {
 	
 	
 	public static boolean unzip(String sourcePath) throws UnsupportedEncodingException {
-		ResourceBundle resource = ResourceBundle.getBundle("config/ship");
-		String zipPath = resource.getString("informZipFilePath");
-		zipPath = new String(zipPath.getBytes("ISO-8859-1"),"utf-8");
+		ResouceBundleUtil bundleUtil = new ResouceBundleUtil(); 
+		String zipPath = bundleUtil.getInfo("config/ship","informZipFilePath"); 
+		logger.debug("即将要解压的压缩文件路径 ： " + zipPath);
 		ReadFile readFile = new ReadFile();
 		UnzipUtil unzipUtil = new UnzipUtil();
 		try {
 			sourcePath = readFile.readLastLine(new File(zipPath), "gbk");
-			String des = resource.getString("unzipPath");
-			des = new String(des.getBytes("ISO-8859-1"),"utf-8");
+			String des = bundleUtil.getInfo("config/ship","unzipPath");
+			logger.debug("解压到的  ： " + zipPath); 
 			unzipUtil.unzip(sourcePath, des);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
